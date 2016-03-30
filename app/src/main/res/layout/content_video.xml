@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/background">
+
+    <WebView
+        android:id="@+id/webview"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:layout_margin="0dp"
+        android:paddingTop="8dp" />
+
+    <ImageButton
+        android:id="@+id/connect_btn"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/ic_connect"
+        android:layout_gravity="center"
+        android:onClick="buttonClick"
+        android:background="@color/red"/>
+
+</LinearLayout>

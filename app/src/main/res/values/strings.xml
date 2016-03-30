@@ -1,0 +1,41 @@
+<resources>
+    <string name="app_name">嬰兒床</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="connection_require">Connection require</string>
+    <string name="connected">Connect to MQTT broker</string>
+    <string name="connect_failure">Connection failure</string>
+
+    <string name="mqtt_broker_ip">MQTT Broker IP</string>
+    <string name="mqtt_broker_port">MQTT Broker Port</string>
+    <string name="webcam_ip">Webcam IP</string>
+
+    <string name="texttest">測試用字串</string>
+
+    <string name="normal">正常</string>
+
+    <!--側邊攔選項-->
+    <string name="menu_main">主畫面</string>
+    <string name="menu_music">音樂</string>
+    <string name="menu_video">看小baby</string>
+    <string name="menu_socket">傳訊息</string>
+    <string name="menu_setting">設定</string>
+
+    <!--主畫面-->
+    <string name="main_name">姓名:</string>
+    <string name="main_edtName">陳禹齊</string>
+    <string name="main_count">生日倒數:</string>
+    <string name="main_edtCount">100天</string>
+    <string name="main_birth">生日:</string>
+    <string name="main_edtBirth">1994.10.3</string>
+    <string name="main_height">身高:</string>
+    <string name="main_edtHeight">cm</string>
+    <string name="main_weight">體重:</string>
+    <string name="main_gender">性別:</string>
+    <string name="main_edtGender">女</string>
+    <string name="txtEdtWeight">kg</string>
+
+
+</resources>

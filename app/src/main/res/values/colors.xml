@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="dialog_background">#55C1FF</color>
+    <color name="text_color">#000000</color>
+
+    <color name="pink">#FFC60D91</color>
+    <color name="red">#FFF73D37</color>
+    <color name="yellow">#FFD4E917</color>
+    <color name="black">#000000</color>
+    <color name="green">#FF5EFF1F</color>
+    <color name="blue">#FF6BDDFC</color>
+    <color name="brightGreen">#FFA7FF95</color>
+    <color name="orange">#FFFF6200</color>
+    <color name="blue2">#FF707AFF</color>
+    <color name="nocolor">#94707eff</color>
+    <color name="socketcolor">#d25c56</color>
+    <color name="sockettop">#FFC45651</color>
+
+</resources>

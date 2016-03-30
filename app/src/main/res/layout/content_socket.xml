@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/sockettop">
+
+        <EditText
+            android:id="@+id/main_et_input"
+            android:layout_width="240dp"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/main_btn_send"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:text="發送"
+            android:background="@color/red"/>
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/main_et_show"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/socketcolor"
+        android:cursorVisible="false"
+        android:editable="false"
+        android:gravity="top"/>
+
+
+
+</LinearLayout>
