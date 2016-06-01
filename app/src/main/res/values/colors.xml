@@ -20,4 +20,14 @@
     <color name="socketcolor">#d25c56</color>
     <color name="sockettop">#FFC45651</color>
 
+    <color name="blueGround">#157CD9</color>
+    <color name="blueBar">#5FB3FF</color>
+    <color name="blueBTN">#80AED7</color>
+    <color name="blueTxt">#024C8F</color>
+    <color name="blueBarTxT">#0A8BFF</color>
+
+    <color name="white">#FFFFFFFF</color>
+
+
+
 </resources>

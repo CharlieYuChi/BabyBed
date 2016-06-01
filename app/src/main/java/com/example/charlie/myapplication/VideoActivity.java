@@ -9,6 +9,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,6 +17,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Toast;
 
+import com.example.charlie.myapplication.setting.*;
 import com.tandong.swichlayout.BaseAnimViewS;
 import com.tandong.swichlayout.BaseEffects;
 import com.tandong.swichlayout.SwichLayoutInterFace;
@@ -47,7 +49,7 @@ public class VideoActivity extends AppCompatActivity implements
     private WebView webview;
 
     //連線用到的變數
-    private String brokerIp;
+    private String Ip;
     private String brokerPort;
 
     //學長的function-processConnect()的變數
@@ -56,6 +58,7 @@ public class VideoActivity extends AppCompatActivity implements
     private static String clientId = "TurtleCarAndroid";
     public static final int TIMEOUT = 3;
 
+    Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,20 +69,30 @@ public class VideoActivity extends AppCompatActivity implements
 
         setEnterSwichLayout();
 
-
-
         webview = (WebView) findViewById(R.id.webview);
         WebSettings webSettings = webview.getSettings();
         webSettings.setJavaScriptEnabled(true);
 
-        Intent intent = this.getIntent();  //一定要加在onCreate裡,放到外面會壞掉
-        brokerIp = intent.getStringExtra("brokerIp");
+        intent = this.getIntent();  //一定要加在onCreate裡,放到外面會壞掉
+
         brokerPort = intent.getStringExtra("brokerPort");
+        Ip = intent.getStringExtra("ip");
+
+        Log.d(" activity", "bIP:" + Ip);
+        Log.d(" activity", "Port:" + brokerPort);
 
         timbre = intent.getStringExtra("timbre");
         speed = intent.getStringExtra("speed");
         tone = intent.getIntExtra("tone", 0);
         volume = intent.getIntExtra("volume", 0);
+
+        if(Ip == null || brokerPort == null){
+            Toast.makeText(this,"IP or Port 未設定!!!", Toast.LENGTH_LONG).show();
+            Log.d("brokerIP Null","NULLLLLL");
+        }else {
+            webview.loadUrl("http://" + Ip + ":" + brokerPort + "/javascript_simple.html");
+            Log.d("No Null", "NONOONONO");
+        }
 
     }
 
@@ -116,16 +129,8 @@ public class VideoActivity extends AppCompatActivity implements
         } else if (id == R.id.nav_video) {
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_video);
             drawer.closeDrawer(GravityCompat.START);
-        }else if (id == R.id.nav_socket){
-            intent.setClass(VideoActivity.this, SocketActivity.class);
-            intent.putExtra("volume", volume);
-            intent.putExtra("tone", tone);
-            intent.putExtra("timbre", timbre);
-            intent.putExtra("speed", speed);
-            startActivity(intent);
-            this.finish();
         } else if (id == R.id.nav_setting){
-            intent.setClass(VideoActivity.this, SettingActivity.class);
+            intent.setClass(VideoActivity.this, com.example.charlie.myapplication.setting.SettingActivity.class);
             startActivityForResult(intent, REQUEST_SETTING);
             this.finish();
         }
@@ -140,7 +145,7 @@ public class VideoActivity extends AppCompatActivity implements
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_SETTING) {
-                brokerIp = data.getStringExtra("brokerIp");
+                Ip = data.getStringExtra("brokerIp");
                 brokerPort = data.getStringExtra("brokerPort");
             } else if (requestCode == REQUEST_MUSIC) {
                 volume = data.getIntExtra("volume", 0);
@@ -170,12 +175,6 @@ public class VideoActivity extends AppCompatActivity implements
         }
     }
 
-    //連線的按鈕
-    public void buttonClick(View view) {
-        //Toast.makeText(VideoActivity.this, "IP or Port not found!",Toast.LENGTH_LONG).show();
-        webview.loadUrl("http://" + brokerIp + ":" + brokerPort + "/javascript_simple.html");
-
-    }
 
     //學長的function還不知道功能
     private void processConnect(String brokerIp, String brokerPort) {

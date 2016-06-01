@@ -5,5 +5,12 @@
         <item name="windowNoTitle">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:actionMenuTextAppearance">@style/MenuTextStyle</item>
     </style>
+
+    <style name="MenuTextStyle">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">50sp</item>
+    </style>
+
 </resources>

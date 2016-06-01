@@ -1,7 +1,12 @@
 package com.example.charlie.myapplication;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.support.design.widget.NavigationView;
@@ -18,6 +23,7 @@ import android.widget.Toast;
 
 
 import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
+import com.example.charlie.myapplication.setting.*;
 import com.tandong.swichlayout.BaseEffects;
 import com.tandong.swichlayout.SwichLayoutInterFace;
 import com.tandong.swichlayout.SwitchLayout;
@@ -72,9 +78,9 @@ public class MainActivity extends AppCompatActivity
     private TextView show_name;
     private TextView show_height;
     private TextView show_weight;
-    private TextView show_percent;
-    private String[] numberOfDays = {"0", "31", "59", "90", "120", "151", "181", "212", "243", "273", "304", "334"};
-    private RoundCornerProgressBar mbirthDay_bar;
+    private TextView show_injectionType;
+    private TextView show_injectDay;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,12 +92,8 @@ public class MainActivity extends AppCompatActivity
         show_name = (TextView) findViewById(R.id.txtEdtName);
         show_height = (TextView) findViewById(R.id.txtEdtHeight);
         show_weight = (TextView) findViewById(R.id.txtEdtWeight);
-        show_percent = (TextView) findViewById(R.id.txtPercent);
-
-
-        mbirthDay_bar = (RoundCornerProgressBar) findViewById(R.id.birthDay_bar);
-        mbirthDay_bar.setMax(365);
-        mbirthDay_bar.setProgress(0);
+        show_injectionType = (TextView) findViewById(R.id.txtInjectType);
+        show_injectDay = (TextView) findViewById(R.id.txtInjectDay);
 
         genderImg = (ImageView) findViewById(R.id.imgGender);
 
@@ -109,7 +111,6 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-
     }
 
 
@@ -119,6 +120,9 @@ public class MainActivity extends AppCompatActivity
 
         setExitSwichLayout();
 
+        Intent stopIntent = new Intent(this, SocketService.class);
+        stopService(stopIntent);
+        /*
         if (mqttClient != null && mqttClient.isConnected()) {
             try {
                 mqttClient.disconnect();
@@ -127,7 +131,7 @@ public class MainActivity extends AppCompatActivity
                 Log.d(getClass().getName(), me.toString());
             }
         }
-
+        */
         super.onDestroy();
     }
 
@@ -139,7 +143,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == Activity.RESULT_OK) {
+        if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_SETTING) {
 
                 brokerIp = data.getStringExtra("brokerIp");
@@ -153,6 +157,17 @@ public class MainActivity extends AppCompatActivity
                 birthMonth = data.getIntExtra("birthMonth",0);
                 birthDay = data.getIntExtra("birthDay",0);
 
+                Log.d(" activity", "bIP:" + brokerIp);
+                Log.d(" activity", "Port:" + brokerPort);
+                Log.d(" activity", "sIP:" + serverIP);
+                Log.d(" activity", "name:" + babyName);
+                Log.d(" activity", "hei:" + height);
+                Log.d(" activity", "wei:" + weight);
+                Log.d(" activity", "gen:" + gender);
+                Log.d(" activity", "year:" + birthYear);
+                Log.d(" activity", "mon:" + birthMonth);
+                Log.d(" activity", "day:" + birthDay);
+
                 //Toast.makeText(MainActivity.this, "MainResultserverIP:" + serverIP , Toast.LENGTH_LONG).show();
                 //Toast.makeText(MainActivity.this, "Main" +"month:" + birthMonth + "day:" + birthDay,Toast.LENGTH_LONG).show();
 
@@ -160,7 +175,6 @@ public class MainActivity extends AppCompatActivity
                 show_height.setText(height);
                 show_weight.setText(weight);
 
-                setBirthDayPercent(birthMonth, birthDay);
 
                 if(gender == GENDER_BOY){
                     genderImg.setImageDrawable(getResources().getDrawable(R.drawable.icon_boy,null));
@@ -194,6 +208,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -202,6 +217,12 @@ public class MainActivity extends AppCompatActivity
         Intent intent = new Intent();
 
         if (id == R.id.nav_main){
+            final int notifyID = 1; // 通知的識別號碼
+            final NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE); // 取得系統的通知服務
+            final Notification notification = new Notification.Builder(getApplicationContext()).setSmallIcon(R.drawable.ic_menu_socket).setContentTitle("內容標題").setContentText("內容文字").build(); // 建立通知
+            notificationManager.notify(notifyID, notification); // 發送通知
+            //https://magiclen.org/android-notifications/
+
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_main);
             drawer.closeDrawer(GravityCompat.START);
         } else if (id == R.id.nav_music) {
@@ -209,22 +230,11 @@ public class MainActivity extends AppCompatActivity
             startActivityForResult(intent, REQUEST_MUSIC);
         } else if (id == R.id.nav_video) {
             intent.setClass(MainActivity.this, VideoActivity.class);
-            intent.putExtra("brokerIP", brokerIp);
+            intent.putExtra("ip", brokerIp);
             intent.putExtra("brokerPort", brokerPort);
             startActivity(intent);
-        } else if (id == R.id.nav_socket){
-            intent.setClass(MainActivity.this, SocketActivity.class);
-            intent.putExtra("volume", volume);
-            intent.putExtra("tone", tone);
-            intent.putExtra("timbre", timbre);
-            intent.putExtra("speed", speed);
-            intent.putExtra("serverIP", serverIP);
-
-            String test = intent.getStringExtra("serverIP");
-            //Toast.makeText(MainActivity.this,  "NavserverIP:" + test , Toast.LENGTH_LONG).show();
-            startActivityForResult(intent, REQUEST_SETTING);
-        } else if (id == R.id.nav_setting){
-            intent.setClass(MainActivity.this, SettingActivity.class);
+        }  else if (id == R.id.nav_setting){
+            intent.setClass(MainActivity.this, com.example.charlie.myapplication.setting.SettingActivity.class);
             startActivityForResult(intent, REQUEST_SETTING);
         }
 
@@ -233,33 +243,8 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    private void setBirthDayPercent(int birthMonth, int birthDay){
-        int birth_total_Days = Integer.valueOf(numberOfDays[birthMonth]) + birthDay;
-        Calendar calendar = Calendar.getInstance();
-        int month = calendar.get(Calendar.MONTH);
-        int days = calendar.get(Calendar.DAY_OF_MONTH);
-        int nowDays = Integer.valueOf(numberOfDays[month]) + days;
-        int percent = 0;
-
-        if(birth_total_Days > nowDays){
-            int test1 = 365 - (birth_total_Days - nowDays);
-            mbirthDay_bar.setProgress(test1);
-            percent = birth_total_Days - nowDays;
-            String text = Integer.toString(percent);
-            show_percent.setText(text);
-        } else if(nowDays > birth_total_Days){
-            int test2 = nowDays - birth_total_Days;
-            mbirthDay_bar.setProgress(test2);
-            percent = 365 - (nowDays - birth_total_Days);
-            String text = Integer.toString(percent);
-            show_percent.setText(text);
-        } else {
-            mbirthDay_bar.setProgress(365);
-            show_percent.setText("0");
-        }
 
 
-    }
     //學長的function還不知道功能
     private void processConnect(String brokerIp, String brokerPort) {
         String broker = "tcp://" + brokerIp + ":" + brokerPort;
@@ -282,6 +267,27 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /*
+    //算下次要打疫苗的日期
+    public int whichDay(){
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+
+        switch (year - birthYear){
+            case 0:
+                break;
+            case 1:
+                break;
+            case 2:
+                break;
+            case 5:
+                break;
+        }
+
+    }
+
+*/
     //換場特效:http://blog.csdn.net/jay100500/article/details/42227365
 
     @Override
@@ -294,3 +300,47 @@ public class MainActivity extends AppCompatActivity
         SwitchLayout.get3DRotateFromRight(this,false,null);
     }
 }
+
+/**
+ *
+ *
+ setBirthDayPercent(birthMonth, birthDay);
+
+ private TextView show_percent;
+ private String[] numberOfDays = {"0", "31", "59", "90", "120", "151", "181", "212", "243", "273", "304", "334"};
+ private RoundCornerProgressBar mbirthDay_bar;
+
+ show_percent = (TextView) findViewById(R.id.txtPercent);
+
+
+ mbirthDay_bar = (RoundCornerProgressBar) findViewById(R.id.birthDay_bar);
+ mbirthDay_bar.setMax(365);
+ mbirthDay_bar.setProgress(0);
+
+ private void setBirthDayPercent(int birthMonth, int birthDay){
+ int birth_total_Days = Integer.valueOf(numberOfDays[birthMonth]) + birthDay;
+ Calendar calendar = Calendar.getInstance();
+ int month = calendar.get(Calendar.MONTH);
+ int days = calendar.get(Calendar.DAY_OF_MONTH);
+ int nowDays = Integer.valueOf(numberOfDays[month]) + days;
+ int percent = 0;
+
+ if(birth_total_Days > nowDays){
+ int test1 = 365 - (birth_total_Days - nowDays);
+ mbirthDay_bar.setProgress(test1);
+ percent = birth_total_Days - nowDays;
+ String text = Integer.toString(percent);
+ show_percent.setText(text);
+ } else if(nowDays > birth_total_Days){
+ int test2 = nowDays - birth_total_Days;
+ mbirthDay_bar.setProgress(test2);
+ percent = 365 - (nowDays - birth_total_Days);
+ String text = Integer.toString(percent);
+ show_percent.setText(text);
+ } else {
+ mbirthDay_bar.setProgress(365);
+ show_percent.setText("0");
+ }
+
+ }
+ **/

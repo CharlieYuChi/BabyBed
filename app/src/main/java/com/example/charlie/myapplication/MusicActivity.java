@@ -12,6 +12,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +23,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.charlie.myapplication.setting.*;
 import com.tandong.swichlayout.BaseAnimViewS;
 import com.tandong.swichlayout.BaseEffects;
 import com.tandong.swichlayout.SwichLayoutInterFace;
@@ -61,7 +63,7 @@ public class MusicActivity extends AppCompatActivity implements
     private  static final int REQUEST_MUSIC = 1;
 
     private Spinner mspinner_timbre, mspinner_speed;
-    private ArrayAdapter<String> lunchList_timbre, lunchList_speed;
+    private ArrayAdapter lunchList_timbre, lunchList_speed;
     private Context mContext;
     private String[] spn_timbre = {"木魚聲", "響板聲", "鼓聲", "音聲", "無聲"};
     private String[] spn_speed = {"0.25", "0.5", "正常", "1.25", "1.5", "2"};
@@ -94,10 +96,11 @@ public class MusicActivity extends AppCompatActivity implements
         tone_value.setText(String.valueOf(tone));
         //Toast.makeText(this,"Ctone:" + tone,Toast.LENGTH_LONG).show();
 
-
-        lunchList_timbre = new ArrayAdapter<String>(MusicActivity.this, android.R.layout.simple_spinner_item, spn_timbre);
+        lunchList_timbre = new ArrayAdapter<String>(MusicActivity.this, R.layout.spinner_item, spn_timbre);
+        lunchList_timbre.setDropDownViewResource(R.layout.spinner_item);
         mspinner_timbre.setAdapter(lunchList_timbre);
-        lunchList_speed = new ArrayAdapter<String>(MusicActivity.this, android.R.layout.simple_spinner_item, spn_speed);
+        lunchList_speed = new ArrayAdapter<String>(MusicActivity.this, R.layout.spinner_item, spn_speed);
+        lunchList_speed.setDropDownViewResource(R.layout.spinner_item);
         mspinner_speed.setAdapter(lunchList_speed);
 
         mspinner_timbre.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -179,6 +182,7 @@ public class MusicActivity extends AppCompatActivity implements
             }
         });
 
+        readData();
         setEnterSwichLayout();
     }
 
@@ -221,20 +225,8 @@ public class MusicActivity extends AppCompatActivity implements
             intent.putExtra("speed", speed);
             startActivity(intent);
             this.finish();
-        } else if (id == R.id.nav_socket){
-            intent.setClass(MusicActivity.this, SocketActivity.class);
-            Intent intent1 = this.getIntent();
-            serverIP = intent1.getStringExtra("serverIP");
-            intent.putExtra("serverIP", serverIP);
-            intent.putExtra("volume", volume);
-            intent.putExtra("tone", tone);
-            intent.putExtra("timbre", timbre);
-            intent.putExtra("speed", speed);
-
-            startActivity(intent);
-            this.finish();
         } else if (id == R.id.nav_setting){
-            intent.setClass(MusicActivity.this, SettingActivity.class);
+            intent.setClass(MusicActivity.this, com.example.charlie.myapplication.setting.SettingActivity.class);
             intent.putExtra("serverIP", serverIP);
             intent.putExtra("volume", volume);
             intent.putExtra("tone", tone);
@@ -288,11 +280,24 @@ public class MusicActivity extends AppCompatActivity implements
                                                     +"spe:" + speed
                                                     +"ton:" + tone
                                                     +"vol:" + volume,Toast.LENGTH_LONG).show();
+        Intent intent = new Intent("MUSICINFO");
+        intent.putExtra("volume",volume);
+        intent.putExtra("tone", tone);
+        intent.putExtra("timbre", timbre);
+        intent.putExtra("speed", speed);
+        sendBroadcast(intent);
     }
 
 
+    public void buttonSend(View view) {
+        Log.d("musicSend", "send begin");
+        SendFile send = new SendFile();
+        send.sendFile("gnash.mp3");
+        Log.d("musicSend", "send end");
+    }
+
     public void readData(){
-        settingsField = getSharedPreferences(data, 0);
+        settingsField = getSharedPreferences(data2, 0);
         volume = Integer.valueOf(settingsField.getString(volumeField, ""));
         tone = Integer.valueOf(settingsField.getString(toneField, ""));
         speed = settingsField.getString(speedField, "");
@@ -304,14 +309,14 @@ public class MusicActivity extends AppCompatActivity implements
     public void saveData(){
         String volTemp = Integer.toString(volume);
         String toneTemp = Integer.toString(tone);
-        settingsField = getSharedPreferences(data,0);
+        settingsField = getSharedPreferences(data2,0);
         settingsField.edit()
                 .putString(volumeField, volTemp)
                 .putString(speedField, speed)
                 .putString(timbreField, timbre)
-                .commit();
+                .apply();
         settingsField = getSharedPreferences(data2,0);
-        settingsField.edit().putString(toneField, toneTemp).commit();
+        settingsField.edit().putString(toneField, toneTemp).apply();
         //Toast.makeText(this, "VF" + settingsField.getString(volumeField,""), Toast.LENGTH_LONG).show();
 
         //Toast.makeText(this, "TF" + settingsField.getString(toneField,""), Toast.LENGTH_LONG).show();

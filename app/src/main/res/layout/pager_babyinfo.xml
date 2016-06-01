@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_margin="20dp">
+
+
+
+    <LinearLayout
+        android:id="@+id/nameBlock"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:layout_marginTop="20dp">
+
+        <TextView
+            android:id="@+id/txtName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/main_name"
+            android:textColor="@color/blueTxt"
+            android:textSize="@dimen/default_textSize"/>
+
+        <EditText
+            android:id="@+id/edtName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/txtHeight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/main_height"
+            android:textColor="@color/blueTxt"
+            android:textSize="@dimen/default_textSize"/>
+
+        <TableLayout
+            android:id="@+id/heightBlock"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:stretchColumns="0">
+
+            <TableRow>
+
+                <EditText
+                    android:id="@+id/edtHeight"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:digits="0123456789" />
+
+                <TextView
+                    android:id="@+id/txtEdtHeight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/main_edtHeight"
+                    android:textSize="@dimen/default_textSize"
+                    android:textColor="@color/blueTxt"
+                    android:layout_toRightOf="@+id/txtHeight"/>
+
+            </TableRow>
+
+        </TableLayout>
+    </LinearLayout>
+
+
+
+    <LinearLayout
+        android:id="@+id/weightBlock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/txtWeight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/main_weight"
+            android:textColor="@color/blueTxt"
+            android:textSize="@dimen/default_textSize"/>
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:stretchColumns="0">
+
+            <TableRow>
+                <EditText
+                    android:id="@+id/edtWeight"
+                    android:layout_width="40dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:digits="0123456789" />
+
+                <TextView
+                    android:id="@+id/txtEdtWeight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/txtEdtWeight"
+                    android:textSize="@dimen/default_textSize"
+                    android:textColor="@color/blueTxt"
+                    android:layout_toRightOf="@+id/txtWeight"/>
+            </TableRow>
+
+        </TableLayout>
+            </LinearLayout>
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/txtGender"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/main_gender"
+                android:textColor="@color/blueTxt"
+                android:textSize="@dimen/default_textSize" />
+
+            <RadioGroup
+                android:id="@+id/rGenderGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TableLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:stretchColumns="0,1">
+
+                    <TableRow>
+                        <RadioButton
+                            android:id="@+id/rBtn_boy"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:text="男"
+                            android:textColor="@color/blueTxt"
+                            android:textSize="@dimen/default_textSize"/>
+                        <RadioButton
+                            android:id="@+id/rBtn_girl"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:text="女"
+                            android:textColor="@color/blueTxt"
+                            android:textSize="@dimen/default_textSize"/>
+
+                    </TableRow>
+                </TableLayout>
+
+            </RadioGroup>
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/txtBirth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="生日:"
+                android:textColor="@color/blueTxt"
+                android:textSize="@dimen/default_textSize"/>
+
+            <EditText
+                android:id="@+id/edtBirth"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/default_textSize"/>
+
+            <ImageButton
+                android:id="@+id/btnBirth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_calendar"
+                android:background="@color/white"/>
+        </LinearLayout>
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="5dp">
+
+            <ImageButton
+                android:id="@+id/OKbtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_setting_check"
+                android:onClick="buttonClick"
+                android:background="@color/white"
+                android:layout_alignParentRight="true"/>
+
+        </RelativeLayout>
+
+
+</LinearLayout>

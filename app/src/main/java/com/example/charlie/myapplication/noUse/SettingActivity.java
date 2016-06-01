@@ -1,4 +1,4 @@
-package com.example.charlie.myapplication;
+package com.example.charlie.myapplication.noUse;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -13,7 +13,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.KeyEvent;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -25,6 +25,10 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.charlie.myapplication.MusicActivity;
+import com.example.charlie.myapplication.R;
+import com.example.charlie.myapplication.SocketActivity;
+import com.example.charlie.myapplication.VideoActivity;
 import com.tandong.swichlayout.BaseAnimViewS;
 import com.tandong.swichlayout.BaseEffects;
 import com.tandong.swichlayout.SwichLayoutInterFace;
@@ -154,6 +158,10 @@ public class SettingActivity extends AppCompatActivity implements
 
     //儲存IP,PORT
     public void buttonClick(View view) {
+        int i =view.getId();
+        if(i == R.id.OKbtn){
+            Log.d("BUTTON","BUTTON CLICK");
+        }
         String babyName;
         String height;
         String weight;
@@ -225,16 +233,6 @@ public class SettingActivity extends AppCompatActivity implements
             intent.setClass(SettingActivity.this, VideoActivity.class);
             intent.putExtra("brokerIP", brokerIp);
             intent.putExtra("brokerPort", brokerPort);
-            startActivity(intent);
-            this.finish();
-        }else if (id == R.id.nav_socket){
-            intent.setClass(SettingActivity.this, SocketActivity.class);
-            intent.putExtra("serverIP", serverIP);
-            intent.putExtra("volume", volume);
-            intent.putExtra("tone", tone);
-            intent.putExtra("timbre", timbre);
-            intent.putExtra("speed", speed);
-            Toast.makeText(SettingActivity.this, "INTENTPUTserverIP:" + serverIP, Toast.LENGTH_LONG).show();
             startActivity(intent);
             this.finish();
         } else if (id == R.id.nav_setting){

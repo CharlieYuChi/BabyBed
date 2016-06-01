@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.net.Socket;
 import android.os.Message;
 import android.os.Handler;
@@ -23,6 +24,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.charlie.myapplication.setting.*;
 import com.tandong.swichlayout.BaseAnimViewS;
 import com.tandong.swichlayout.BaseEffects;
 import com.tandong.swichlayout.SwichLayoutInterFace;
@@ -59,7 +61,6 @@ public class SocketActivity extends AppCompatActivity implements
     private static final String serverIPField = "";
     private String serverIP = "";
     private Intent intent;
-
 
 
     @Override
@@ -116,6 +117,8 @@ public class SocketActivity extends AppCompatActivity implements
                 Socket socket;
                 try {
                     socket = new Socket(serverIP, 8080);
+                    //socket = new Socket("140.115.204.92", 8080);
+                    //socket = new Socket("192.168.0.101",8080);
                     // 客户端启动ClientThread线程不断读取来自服务器的数据
                     new Thread(new ClientThread(socket, handler)).start();
                     os = socket.getOutputStream();
@@ -179,11 +182,8 @@ public class SocketActivity extends AppCompatActivity implements
             intent.setClass(SocketActivity.this, VideoActivity.class);
             startActivity(intent);
             this.finish();
-        }else if (id == R.id.nav_socket){
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_socket);
-            drawer.closeDrawer(GravityCompat.START);
         } else if (id == R.id.nav_setting){
-            intent.setClass(SocketActivity.this, SettingActivity.class);
+            intent.setClass(SocketActivity.this, com.example.charlie.myapplication.setting.SettingActivity.class);
 
             startActivityForResult(intent, REQUEST_SETTING);
             this.finish();

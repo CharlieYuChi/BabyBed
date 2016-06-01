@@ -3,16 +3,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/background">
+    android:background="@color/white">
 
+    <!--
     <TextView
         android:id="@+id/setting_txt_settingTitle"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:text="設定連線選項"
         android:textSize="@dimen/default_textSize"
-        android:background="@color/red"
-        android:textColor="@color/black"
+        android:background="@color/blueBar"
+        android:textColor="@color/blueBarTxT"
         android:gravity="center"/>
 
     <LinearLayout
@@ -31,6 +32,7 @@
                 android:layout_height="wrap_content"
                 android:text="IP:"
                 android:textSize="@dimen/default_textSize"
+                android:textColor="@color/blueTxt"
                 android:layout_below="@+id/toolbar_setting" />
 
             <EditText
@@ -53,6 +55,7 @@
                 android:layout_height="wrap_content"
                 android:text="ServerIP:"
                 android:textSize="@dimen/default_textSize"
+                android:textColor="@color/blueTxt"
                 android:layout_below="@+id/toolbar_setting" />
 
             <EditText
@@ -75,6 +78,7 @@
                 android:layout_height="wrap_content"
                 android:text="port:"
                 android:textSize="25dp"
+                android:textColor="@color/blueTxt"
                 android:layout_below="@+id/edtIP"/>
 
             <EditText
@@ -94,8 +98,8 @@
         android:layout_height="50dp"
         android:text="設定基本資料"
         android:textSize="@dimen/default_textSize"
-        android:background="@color/red"
-        android:textColor="@color/black"
+        android:background="@color/blueBar"
+        android:textColor="@color/blueBarTxT"
         android:gravity="center"/>
 
     <LinearLayout
@@ -118,6 +122,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/main_name"
+                    android:textColor="@color/blueTxt"
                     android:textSize="@dimen/default_textSize"/>
 
                 <EditText
@@ -138,6 +143,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/main_height"
+                    android:textColor="@color/blueTxt"
                     android:textSize="@dimen/default_textSize"/>
 
                 <EditText
@@ -153,6 +159,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/main_edtHeight"
                     android:textSize="@dimen/default_textSize"
+                    android:textColor="@color/blueTxt"
                     android:layout_toRightOf="@+id/txtHeight"/>
             </LinearLayout>
 
@@ -167,6 +174,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/main_weight"
+                    android:textColor="@color/blueTxt"
                     android:textSize="@dimen/default_textSize"/>
 
                 <EditText
@@ -182,6 +190,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/txtEdtWeight"
                     android:textSize="@dimen/default_textSize"
+                    android:textColor="@color/blueTxt"
                     android:layout_toRightOf="@+id/txtWeight"/>
 
             </LinearLayout>
@@ -198,6 +207,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/main_gender"
+                android:textColor="@color/blueTxt"
                 android:textSize="@dimen/default_textSize" />
 
             <RadioGroup
@@ -210,12 +220,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="小男生"
+                    android:textColor="@color/blueTxt"
                     android:textSize="@dimen/default_textSize"/>
                 <RadioButton
                     android:id="@+id/rBtn_girl"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="小女生"
+                    android:textColor="@color/blueTxt"
                     android:textSize="@dimen/default_textSize"/>
             </RadioGroup>
         </LinearLayout>
@@ -232,6 +244,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="出生日期:"
+            android:textColor="@color/blueTxt"
             android:textSize="@dimen/default_textSize"/>
 
         <EditText
@@ -247,7 +260,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_calendar"
             android:layout_alignParentRight="true"
-            android:background="@color/nocolor"/>
+            android:background="@color/white"/>
 
         <ImageButton
             android:id="@+id/OKbtn"
@@ -256,9 +269,9 @@
             android:layout_alignParentBottom="true"
             android:src="@drawable/ic_setting_check"
             android:onClick="buttonClick"
-            android:background="@color/blue2" />
+            android:background="@color/blueBTN" />
 
     </RelativeLayout>
 
-
+-->
 </LinearLayout>
