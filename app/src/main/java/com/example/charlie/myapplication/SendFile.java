@@ -15,7 +15,7 @@ import java.net.Socket;
 public class SendFile {
 
     public static void main(String[] args) {
-        sendFile("gnash.mp3");
+        sendFile("/sdcard/gnash.mp3");
     }
 
     public static void sendFile(String fileName){
@@ -28,7 +28,8 @@ public class SendFile {
         //System.out.println(fileNameLen);
         try {
             FileInputStream fos = new FileInputStream(file); //增加網絡服務器接受客戶請求
-            Socket server = new Socket("127.0.0.1", 8080);
+            //Socket server = new Socket("127.0.0.1", 8080);
+            Socket server = new Socket("140.115.204.92", 8080);
             OutputStream netOut = server.getOutputStream();
             OutputStream doc = new DataOutputStream(new BufferedOutputStream(netOut)); //增加文件讀取緩衝區
             byte[] buf = new byte[2048];

@@ -82,10 +82,10 @@ public class SocketService extends Service {
                 Socket socket;
                 try {
                     //socket = new Socket("140.115.204.92", 8080);
-                    socket = new Socket("192.168.0.102",8080);
+                    socket = new Socket("192.168.0.112",8080);
                     output = new byte[]{0x00,0x30};
                     Log.d("service2:", output.toString());
-                    //try {
+                    //try {44
 
                     //} catch (IOException e) {
                         //Log.d("service:", "NO~~~~~");
@@ -133,13 +133,17 @@ public class SocketService extends Service {
             speed = intent.getStringExtra("speed");
             Toast.makeText(context, "Music: " + intent.getIntExtra("volume",0), Toast.LENGTH_LONG).show();
 
-            output = new byte[]{VOLUME, 0x31};
+            Byte temp;
+            temp = Byte.valueOf((byte) volume);
+            Log.d("socketSend",temp.toString());
+            output = new byte[]{VOLUME, 0x31, temp};
             try {
                 writer.write(output);
                 writer.flush();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            /*
             output = new byte[]{TONE, 0x31};
             try {
                 writer.write(output);
@@ -161,6 +165,7 @@ public class SocketService extends Service {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            */
             //writer.println("Music:" + tone);
             //writer.println("Music:" + timbre);
             //writer.println("Music:" + speed);
