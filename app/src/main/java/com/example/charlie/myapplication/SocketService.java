@@ -39,8 +39,8 @@ public class SocketService extends Service {
     Bundle bundle;
     int volume;
     int tone;
-    String timbre;
-    String speed;
+    int timbre;
+    int speed;
 
     @Override
     public void onDestroy() {
@@ -82,7 +82,9 @@ public class SocketService extends Service {
                 Socket socket;
                 try {
                     //socket = new Socket("140.115.204.92", 8080);
-                    socket = new Socket("192.168.0.112",8080);
+                    //socket = new Socket("192.168.0.113",8080);
+                    socket = new Socket(serverIP,8080);
+
                     output = new byte[]{0x00,0x30};
                     Log.d("service2:", output.toString());
                     //try {44
@@ -129,43 +131,67 @@ public class SocketService extends Service {
         public void onReceive(Context context, Intent intent) {
             volume = intent.getIntExtra("volume", 0);
             tone = intent.getIntExtra("tone", 0);
-            timbre = intent.getStringExtra("timbre");
-            speed = intent.getStringExtra("speed");
-            Toast.makeText(context, "Music: " + intent.getIntExtra("volume",0), Toast.LENGTH_LONG).show();
+            timbre = intent.getIntExtra("timbre",0);
+            speed = intent.getIntExtra("speed",0);
+            Toast.makeText(context, "Music: " + intent.getIntExtra("timbre",0), Toast.LENGTH_LONG).show();
 
             Byte temp;
-            temp = Byte.valueOf((byte) volume);
-            Log.d("socketSend",temp.toString());
+
+            temp = (byte) volume;
+            Log.d("socketSend1",temp.toString());
             output = new byte[]{VOLUME, 0x31, temp};
             try {
                 writer.write(output);
                 writer.flush();
+                Thread.sleep(500);
             } catch (IOException e) {
                 e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-            /*
-            output = new byte[]{TONE, 0x31};
+
+            temp = (byte) tone;
+            Log.d("socketSend2",temp.toString());
+            output = new byte[]{TONE, 0x31, temp};
             try {
                 writer.write(output);
                 writer.flush();
+                Thread.sleep(500);
             } catch (IOException e) {
                 e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-            output = new byte[]{TIMBRE, 0x31};
+
+            temp = (byte) speed;
+            Log.d("socketSend3",temp.toString());
+            output = new byte[]{SPEED, 0x31, temp};
             try {
                 writer.write(output);
                 writer.flush();
+                Thread.sleep(500);
             } catch (IOException e) {
                 e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-            output = new byte[]{SPEED, 0x31};
+
+
+            temp = (byte)timbre;
+            Log.d("socketSend4",temp.toString());
+            output = new byte[]{TIMBRE, 0x31, temp};
             try {
                 writer.write(output);
                 writer.flush();
+                Thread.sleep(500);
             } catch (IOException e) {
                 e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-            */
+
+
+
             //writer.println("Music:" + tone);
             //writer.println("Music:" + timbre);
             //writer.println("Music:" + speed);
@@ -186,6 +212,7 @@ public class SocketService extends Service {
         }
 
     }
+
     @Override
     public boolean onUnbind(Intent intent) {
         return super.onUnbind(intent);

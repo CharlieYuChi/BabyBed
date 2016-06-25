@@ -62,6 +62,10 @@ public class SettingActivity extends AppCompatActivity implements
     private static final String nameField = "NAME";
     private static final String heightField = "HEIGHT";
     private static final String weightField = "WEIGHT";
+    private static final String genderField = "GENDER";
+    private static final String birthYearField = "YEAR";
+    private static final String birthMonthField = "MONTH";
+    private static final String birthDayField = "DAY";
 
     //Music用的變數
     private int volume;
@@ -202,9 +206,6 @@ public class SettingActivity extends AppCompatActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-
-
         Log.d("setting activity", "bIP:" + brokerIp);
         Log.d("setting activity", "Port:" + brokerPort);
         Log.d("setting activity", "sIP:" + serverIP);
@@ -226,6 +227,10 @@ public class SettingActivity extends AppCompatActivity implements
                 .putString(nameField, name)
                 .putString(heightField, height)
                 .putString(weightField, weight)
+                .putInt(genderField, gender)
+                .putInt(birthYearField, birthYear)
+                .putInt(birthMonthField, birthMonth)
+                .putInt(birthDayField, birthDay)
                 .apply();
     }
 

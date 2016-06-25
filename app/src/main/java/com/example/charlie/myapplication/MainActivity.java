@@ -175,13 +175,13 @@ public class MainActivity extends AppCompatActivity
                 show_height.setText(height);
                 show_weight.setText(weight);
 
-
-                if(gender == GENDER_BOY){
-                    genderImg.setImageDrawable(getResources().getDrawable(R.drawable.icon_boy,null));
-                } else if(gender == GENDER_GIRL){
-                    genderImg.setImageDrawable(getResources().getDrawable(R.drawable.ic_girl,null));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    if (gender == GENDER_BOY) {
+                        genderImg.setImageDrawable(getResources().getDrawable(R.drawable.icon_boy, null));
+                    } else if (gender == GENDER_GIRL) {
+                        genderImg.setImageDrawable(getResources().getDrawable(R.drawable.ic_girl, null));
+                    }
                 }
-
                 //Toast.makeText(MainActivity.this, "IP:" + brokerIp + " Port:" + brokerPort + "serverIP:" + serverIP , Toast.LENGTH_LONG).show();
                 processConnect(brokerIp, brokerPort);
             } else if (requestCode == REQUEST_MUSIC) {

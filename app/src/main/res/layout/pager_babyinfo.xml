@@ -132,37 +132,32 @@
 
             <RadioGroup
                 android:id="@+id/rGenderGroup"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:paddingBottom="5dp"
+                >
 
-                <TableLayout
-                    android:layout_width="match_parent"
+                <RadioButton
+                    android:id="@+id/rBtn_boy"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:stretchColumns="0,1">
-
-                    <TableRow>
-                        <RadioButton
-                            android:id="@+id/rBtn_boy"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:text="男"
-                            android:textColor="@color/blueTxt"
-                            android:textSize="@dimen/default_textSize"/>
-                        <RadioButton
-                            android:id="@+id/rBtn_girl"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:text="女"
-                            android:textColor="@color/blueTxt"
-                            android:textSize="@dimen/default_textSize"/>
-
-                    </TableRow>
-                </TableLayout>
+                    android:layout_gravity="center_horizontal"
+                    android:paddingRight="100dp"
+                    android:text="男"
+                    android:textColor="@color/blueTxt"
+                    android:textSize="@dimen/default_textSize"/>
+                <RadioButton
+                    android:id="@+id/rBtn_girl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="女"
+                    android:textColor="@color/blueTxt"
+                    android:textSize="@dimen/default_textSize"/>
 
             </RadioGroup>
+
         </LinearLayout>
 
 

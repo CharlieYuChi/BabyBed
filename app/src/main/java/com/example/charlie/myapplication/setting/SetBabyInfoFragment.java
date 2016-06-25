@@ -61,6 +61,10 @@ public class SetBabyInfoFragment extends BaseFragment {
     private static final String nameField = "NAME";
     private static final String heightField = "HEIGHT";
     private static final String weightField = "WEIGHT";
+    private static final String genderField = "GENDER";
+    private static final String birthYearField = "YEAR";
+    private static final String birthMonthField = "MONTH";
+    private static final String birthDayField = "DAY";
 
     //傳給SettingActivity的資料
     Bundle data;
@@ -111,9 +115,9 @@ public class SetBabyInfoFragment extends BaseFragment {
         medtHeight = (EditText) view.findViewById(R.id.edtHeight);
         medtWeight = (EditText) view.findViewById(R.id.edtWeight);
 
+        mrGenderGroup = (RadioGroup) view.findViewById(R.id.rGenderGroup);
         mrBtn_boy = (RadioButton) view.findViewById(R.id.rBtn_boy);
         mrBtn_girl = (RadioButton) view.findViewById(R.id.rBtn_girl);
-        mrGenderGroup = (RadioGroup) view.findViewById(R.id.rGenderGroup);
 
         medtBirth = (TextView) view.findViewById(R.id.edtBirth);
 
@@ -125,8 +129,24 @@ public class SetBabyInfoFragment extends BaseFragment {
             }
         });
 
+        //性別的按鈕
+        mrGenderGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
 
-        mrGenderGroup.setOnCheckedChangeListener(listener);
+                Log.d("check ", "HI");
+                switch (checkedId) {
+                    case R.id.rBtn_boy:
+                        gender = GENDER_BOY;
+                        Toast.makeText(getActivity(), "" + gender,Toast.LENGTH_LONG).show();
+                        break;
+                    case R.id.rBtn_girl:
+                        gender = GENDER_GIRL;
+                        Toast.makeText(getContext(), "" + gender,Toast.LENGTH_LONG).show();
+                        break;
+                }
+            }
+        });
 
         readData();
         mOkbtn = (ImageButton) view.findViewById(R.id.OKbtn);
@@ -159,6 +179,7 @@ public class SetBabyInfoFragment extends BaseFragment {
 
     }
 
+
     public void showDatePickerDialog() {
         // 設定初始日期
         final Calendar c = Calendar.getInstance();
@@ -187,23 +208,7 @@ public class SetBabyInfoFragment extends BaseFragment {
         dpd.show();
     }
 
-    //性別的按鈕
-    private RadioGroup.OnCheckedChangeListener listener = new RadioGroup.OnCheckedChangeListener(){
-        @Override
-        public void onCheckedChanged(RadioGroup group, int checkedId) {
 
-            Log.d("check ", "HI");
-            switch (checkedId) {
-                case R.id.rBtn_boy:
-                    gender = GENDER_BOY;
-                    Log.d("check gender", "" + gender);
-                    break;
-                case R.id.rBtn_girl:
-                    gender = GENDER_GIRL;
-                    break;
-            }
-        }
-    };
 
 
     public void readData(){
@@ -211,6 +216,14 @@ public class SetBabyInfoFragment extends BaseFragment {
         medtName.setText(settingsField.getString(nameField, ""));
         medtHeight.setText(settingsField.getString(heightField, ""));
         medtWeight.setText(settingsField.getString(weightField, ""));
+        if(settingsField.getInt(genderField,0) == 0){
+            mrGenderGroup.check(R.id.rBtn_boy);
+        } else {
+            mrGenderGroup.check(R.id.rBtn_girl);
+        }
+        medtBirth.setText(settingsField.getInt(birthYearField, 0) + "-"
+                + (settingsField.getInt(birthMonthField, 0) + 1) + "-"
+                + settingsField.getInt(birthDayField, 0));
 
     }
 
