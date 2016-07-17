@@ -292,15 +292,16 @@ public class MusicActivity extends AppCompatActivity implements
             Uri uri = data.getData();
             String path = uri.getPath();
             String path1 = uri.toString();
+            String path2 = uri.getFragment();
             //path = uri.toString();
             File extpath = Environment.getExternalStorageDirectory();
 
             //path = Uri.parse(String.valueOf(uri)).getLastPathSegment();
             Log.d("musicGetPath", path);
             Log.d("musicGetPath1", path1);
+            Log.d("musicGetPath2", path2);
 
-
-            Log.d("musicPath",filePath);
+            Log.d("musicPath",extpath.toString());
             Log.d("buttonSend","Startsend");
             SendFile sendFile = new SendFile();
             try {
