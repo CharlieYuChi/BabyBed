@@ -105,7 +105,6 @@ public class MusicActivity extends AppCompatActivity implements
     private GoogleApiClient client;
     private MediaPlayer mp = new MediaPlayer();
 
-    String filePath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,7 +114,8 @@ public class MusicActivity extends AppCompatActivity implements
         verifyStoragePermissions(this);
 
         iniBarComponent();  //初始化AppBar
-        filePath = new String();
+        intent = this.getIntent();
+        serverIP = intent.getStringExtra("serverIP");
 
         final SeekBar volume_bar = (SeekBar) findViewById(R.id.seekbar_volume);
         final SeekBar tone_bar = (SeekBar) findViewById(R.id.seekbar_tone);
@@ -298,11 +298,12 @@ public class MusicActivity extends AppCompatActivity implements
             Log.d("buttonSend","Startsend");
             SendFile sendFile = new SendFile();
             try {
-                sendFile.sendFile(uripath);
+                sendFile.sendFile(uripath,serverIP);
             } catch (IOException e) {
 
             }
             Log.d("buttonSend","Endsend");
+            Toast.makeText(this,"傳送完成^^",Toast.LENGTH_LONG).show();
         }
 
 

@@ -185,6 +185,7 @@ public class SettingActivity extends AppCompatActivity implements
             this.finish();
         } else if (id == R.id.nav_music) {
             intent.setClass(SettingActivity.this, MusicActivity.class);
+            intent.putExtra("serverIP", serverIP);
             startActivity(intent);
             this.finish();
         } else if (id == R.id.nav_video) {

@@ -36,7 +36,7 @@ public class SendFile {
 
 
 
-    public static void sendFile(final String extpath) throws IOException {
+    public static void sendFile(final String extpath, final String serverIP) throws IOException {
 
         new Thread(new Runnable() {
             @Override
@@ -54,8 +54,11 @@ public class SendFile {
                     //Socket server = new Socket("127.0.0.1", 8080);
                     //Socket server = new Socket("140.115.204.92", 8080);
                     //Socket server = new Socket("192.168.0.112",8080);
-                    Socket server = new Socket("192.168.1.109", 8080);
+                    //Socket server = new Socket("192.168.1.109", 8080);
                     //Socket server = new Socket("192.168.0.103",8080);
+                    Log.d("serverIP", serverIP);
+                    Socket server = new Socket(serverIP, 8080);
+
                     OutputStream netOut = server.getOutputStream();
                     //DataOutputStream dos = new DataOutputStream(netOut);
                     //PrintStream writer = new PrintStream(netOut);
