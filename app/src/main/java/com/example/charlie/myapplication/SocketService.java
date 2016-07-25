@@ -151,6 +151,8 @@ public class SocketService extends Service {
             }
 
             temp = (byte) tone;
+
+
             Log.d("socketSend2",temp.toString());
             output = new byte[]{TONE, 0x31, temp};
             try {

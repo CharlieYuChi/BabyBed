@@ -290,22 +290,15 @@ public class MusicActivity extends AppCompatActivity implements
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
             Uri uri = data.getData();
-            String path = uri.getPath();
-            String path1 = uri.toString();
-            String path2 = uri.getFragment();
-            //path = uri.toString();
-            File extpath = Environment.getExternalStorageDirectory();
+            String uripath = ImageFilePath.getPath(this, uri);
 
-            //path = Uri.parse(String.valueOf(uri)).getLastPathSegment();
-            Log.d("musicGetPath", path);
-            Log.d("musicGetPath1", path1);
-            Log.d("musicGetPath2", path2);
+            Log.d("uriPath", uripath);
 
-            Log.d("musicPath",extpath.toString());
+
             Log.d("buttonSend","Startsend");
             SendFile sendFile = new SendFile();
             try {
-                sendFile.sendFile(extpath);
+                sendFile.sendFile(uripath);
             } catch (IOException e) {
 
             }

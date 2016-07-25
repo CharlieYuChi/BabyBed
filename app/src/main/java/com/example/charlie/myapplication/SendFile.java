@@ -36,17 +36,14 @@ public class SendFile {
 
 
 
-    public static void sendFile(File extpath) throws IOException {
+    public static void sendFile(final String extpath) throws IOException {
 
         new Thread(new Runnable() {
             @Override
             public void run() {
                 //if (fileName == null) return; //增加文件流用來讀取文件中的資料
-                //File file = new File("My Songs Know What You Did In The Dark (Light Em Up) - from YouTube.mp3");
-                File testEx = Environment.getExternalStorageDirectory();
-                Log.d("File", testEx.toString());
                 //File file = new File("/storage/emulated/0/Download/", "My Songs Know What You Did In The Dark (Light Em Up) - from YouTube.mp3");
-                File file = new File("/document/audio:47", "My Songs Know What You Did In The Dark (Light Em Up) - from YouTube.mp3");
+                File file = new File(extpath);
                 System.out.println("文件長度:" + (int) file.length()); // public Socket accept() throws
                 System.out.println("文件名稱:" + file.getName()); // public Socket accept() throws
                 System.out.println("文件檔名長度:" + file.getName().getBytes().length); // public Socket accept() throws
@@ -57,8 +54,8 @@ public class SendFile {
                     //Socket server = new Socket("127.0.0.1", 8080);
                     //Socket server = new Socket("140.115.204.92", 8080);
                     //Socket server = new Socket("192.168.0.112",8080);
-                    //Socket server = new Socket("192.168.1.109", 8080);
-                    Socket server = new Socket("192.168.0.103",8080);
+                    Socket server = new Socket("192.168.1.109", 8080);
+                    //Socket server = new Socket("192.168.0.103",8080);
                     OutputStream netOut = server.getOutputStream();
                     //DataOutputStream dos = new DataOutputStream(netOut);
                     //PrintStream writer = new PrintStream(netOut);
