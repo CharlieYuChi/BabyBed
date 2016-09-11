@@ -223,7 +223,7 @@ public class MusicActivity extends AppCompatActivity implements
             }
         });
 
-        readData();
+        //readData();
         setEnterSwichLayout();
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.

@@ -36,6 +36,22 @@
             android:padding="3dp"
             android:src="@drawable/baby"/>
 
+        <ImageButton
+            android:id="@+id/btn_changeMainBackground"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+
+            android:src="@drawable/ic_camera_alt_black_24dp"/>
+
+        <ImageButton
+            android:id="@+id/btn_changeMainPhoto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/imageView3"
+            android:layout_alignParentBottom="true"
+            android:src="@drawable/ic_camera_alt_black_24dp"/>
+
     </RelativeLayout>
 
 

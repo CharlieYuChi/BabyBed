@@ -41,6 +41,7 @@ public class SocketService extends Service {
     int tone;
     int timbre;
     int speed;
+    Socket socket;
 
     @Override
     public void onDestroy() {
@@ -79,7 +80,7 @@ public class SocketService extends Service {
             @Override
             public void run() {
                 // 开始执行后台任务
-                Socket socket;
+
                 try {
                     //socket = new Socket("140.115.204.92", 8080);
                     //socket = new Socket("192.168.0.113",8080);
@@ -138,6 +139,7 @@ public class SocketService extends Service {
             Byte temp;
 
             temp = (byte) volume;
+            Byte datalength = 4;
             Log.d("socketSend1",temp.toString());
             output = new byte[]{VOLUME, 0x31, temp};
             try {

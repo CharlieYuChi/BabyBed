@@ -42,7 +42,6 @@ public class MainActivity extends AppCompatActivity
 
     //Setting用的變數
     private String brokerIp;
-    private String brokerPort;
     public static String serverIP = "";
     private String babyName;
     private String height;
@@ -147,7 +146,6 @@ public class MainActivity extends AppCompatActivity
             if (requestCode == REQUEST_SETTING) {
 
                 brokerIp = data.getStringExtra("brokerIp");
-                brokerPort = data.getStringExtra("brokerPort");
                 serverIP = data.getStringExtra("serverIP");
                 babyName = data.getStringExtra("babyName");
                 height = data.getStringExtra("height");
@@ -158,7 +156,6 @@ public class MainActivity extends AppCompatActivity
                 birthDay = data.getIntExtra("birthDay",0);
 
                 Log.d(" activity", "bIP:" + brokerIp);
-                Log.d(" activity", "Port:" + brokerPort);
                 Log.d(" activity", "sIP:" + serverIP);
                 Log.d(" activity", "name:" + babyName);
                 Log.d(" activity", "hei:" + height);
@@ -183,7 +180,6 @@ public class MainActivity extends AppCompatActivity
                     }
                 }
                 //Toast.makeText(MainActivity.this, "IP:" + brokerIp + " Port:" + brokerPort + "serverIP:" + serverIP , Toast.LENGTH_LONG).show();
-                processConnect(brokerIp, brokerPort);
             } else if (requestCode == REQUEST_MUSIC) {
 
                 volume = data.getIntExtra("volume", 0);
@@ -230,8 +226,8 @@ public class MainActivity extends AppCompatActivity
             startActivityForResult(intent, REQUEST_MUSIC);
         } else if (id == R.id.nav_video) {
             intent.setClass(MainActivity.this, VideoActivity.class);
-            intent.putExtra("ip", brokerIp);
-            intent.putExtra("brokerPort", brokerPort);
+            intent.putExtra("brokerIP", brokerIp);
+            intent.putExtra("serverIP", serverIP);
             startActivity(intent);
         }  else if (id == R.id.nav_setting){
             intent.setClass(MainActivity.this, com.example.charlie.myapplication.setting.SettingActivity.class);

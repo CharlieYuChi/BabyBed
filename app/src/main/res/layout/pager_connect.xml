@@ -60,28 +60,6 @@
 
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="10dp">
-
-            <TextView
-                android:id="@+id/txtPort"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="port:"
-                android:textSize="@dimen/default_textSize"
-                android:textColor="@color/blueTxt"
-                android:layout_below="@+id/edtIP"/>
-
-            <EditText
-                android:id="@+id/edtPort"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="number"
-                android:digits="0123456789" />
-        </LinearLayout>
     </LinearLayout>
 
 

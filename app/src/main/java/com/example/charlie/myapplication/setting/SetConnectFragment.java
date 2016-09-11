@@ -33,16 +33,14 @@ public class SetConnectFragment extends BaseFragment{
     private SharedPreferences settingsField;
     private static final String data = "DATA";
     private static final String ipField = "IP";
-    private static final String portField = "PORT";
     private static final String serverIPField = "SERVER_IP";
 
     private EditText medtIP;
-    private EditText medtPort;
     private EditText medtServerIP;
 
     //用來和SettingActivity傳遞資料的接口
     public interface callBackConnect{
-        void saveConnect(String bIP, String Port, String sIP);
+        void saveConnect(String bIP, String sIP);
     }
 
 
@@ -83,24 +81,25 @@ public class SetConnectFragment extends BaseFragment{
         v = inflater.inflate(R.layout.pager_connect, container, false);
 
         medtIP = (EditText) v.findViewById(R.id.edtIP);
-        medtPort = (EditText) v.findViewById(R.id.edtPort);
         medtServerIP = (EditText) v.findViewById(R.id.edtServerIP);
 
         readData();
 
         mOkbtn = (ImageButton) v.findViewById(R.id.OKbtn);
 
+
         //設定按鈕按下去就傳送資料給SettingActivity
         mOkbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mCallbackConnect.saveConnect(medtIP.getText().toString(), medtPort.getText().toString(), medtServerIP.getText().toString());
-                Intent startIntent = new Intent(v.getContext(), SocketService.class);
-                startIntent.putExtra("serverIP", medtServerIP.getText().toString());
-                v.getContext().startService(startIntent);
-                Log.d("SetConnect", "startService executed");
+                mCallbackConnect.saveConnect(medtIP.getText().toString(), medtServerIP.getText().toString());
+                //Intent startIntent = new Intent(v.getContext(), SocketService.class);
+                //startIntent.putExtra("serverIP", medtServerIP.getText().toString());
+                //v.getContext().startService(startIntent);
+                //Log.d("SetConnect", "startService executed");
             }
         });
+
 
         return v;
     }
@@ -108,7 +107,6 @@ public class SetConnectFragment extends BaseFragment{
     public void readData(){
         settingsField = this.getActivity().getSharedPreferences(data,0);
         medtIP.setText(settingsField.getString(ipField, ""));
-        medtPort.setText(settingsField.getString(portField, ""));
         medtServerIP.setText(settingsField.getString(serverIPField, ""));
 
     }

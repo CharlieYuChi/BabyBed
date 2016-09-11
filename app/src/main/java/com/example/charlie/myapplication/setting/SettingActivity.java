@@ -84,18 +84,15 @@ public class SettingActivity extends AppCompatActivity implements
     /**
      *
      * @param bIP
-     * @param Port
      * @param sIP
      *
      * 用來讀取連線設定的資料
      */
-    public void saveConnect(String bIP, String Port, String sIP){
+    public void saveConnect(String bIP, String sIP){
         brokerIp = bIP;
-        brokerPort = Port;
         serverIP = sIP;
 
         intent.putExtra("brokerIp", brokerIp);
-        intent.putExtra("brokerPort", brokerPort);
         intent.putExtra("serverIP", serverIP);
 
         saveData();
@@ -191,7 +188,7 @@ public class SettingActivity extends AppCompatActivity implements
         } else if (id == R.id.nav_video) {
             intent.setClass(SettingActivity.this, VideoActivity.class);
             intent.putExtra("brokerIP", brokerIp);
-            intent.putExtra("brokerPort", brokerPort);
+            intent.putExtra("serverIP", serverIP);
             startActivity(intent);
             this.finish();
         } else if (id == R.id.nav_setting){
@@ -208,7 +205,6 @@ public class SettingActivity extends AppCompatActivity implements
     protected void onDestroy() {
         super.onDestroy();
         Log.d("setting activity", "bIP:" + brokerIp);
-        Log.d("setting activity", "Port:" + brokerPort);
         Log.d("setting activity", "sIP:" + serverIP);
         Log.d("setting activity", "name:" + name);
         Log.d("setting activity", "hei:" + height);
@@ -223,7 +219,6 @@ public class SettingActivity extends AppCompatActivity implements
         settingsField = getSharedPreferences(data,0);
         settingsField.edit()
                 .putString(ipField, brokerIp)
-                .putString(portField, brokerPort)
                 .putString(serverIPField, serverIP)
                 .putString(nameField, name)
                 .putString(heightField, height)
