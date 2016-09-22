@@ -6,6 +6,7 @@ import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
+import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
@@ -86,7 +87,9 @@ public class VideoActivity extends AppCompatActivity implements
     //通話變數
     private boolean isRecording = false ;
     private Socket socket;
-
+    private MediaPlayer mr;
+    private String path = "";
+    private AudioCapturer ac;
 
     Intent intent;
     /**
@@ -304,22 +307,26 @@ public class VideoActivity extends AppCompatActivity implements
 
             public void run() {
                 Log.d("buttonCall","Start!!!!!!!!!!!");
-                record();
+                //record();
 
             }
 
         });
-
         thread.start();
+
+        ac = new AudioCapturer();
+        ac.startCapture();
     }
 
     //掛電話
     public void buttonHangup(View view) {
-        isRecording = false ;
-        play();
+        isRecording = false;
+        //play();
+        ac.stopCapture();
     }
 
 
+/*
     public void record() {
 
         int frequency = 8000;
@@ -352,7 +359,7 @@ public class VideoActivity extends AppCompatActivity implements
             Log.d("Record", "Record Start~!");
             //socket = new Socket(serverIp,8080);
 
-            Log.d("record","socket OK~~");
+            //Log.d("record","socket OK~~");
 
             OutputStream os = new FileOutputStream(file);
             //OutputStream os = socket.getOutputStream();
@@ -476,4 +483,5 @@ public class VideoActivity extends AppCompatActivity implements
         }
 
     }
+    */
 }
