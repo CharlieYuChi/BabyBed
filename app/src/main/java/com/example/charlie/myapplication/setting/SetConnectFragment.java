@@ -93,10 +93,11 @@ public class SetConnectFragment extends BaseFragment{
             @Override
             public void onClick(View v) {
                 mCallbackConnect.saveConnect(medtIP.getText().toString(), medtServerIP.getText().toString());
-                //Intent startIntent = new Intent(v.getContext(), SocketService.class);
-                //startIntent.putExtra("serverIP", medtServerIP.getText().toString());
-                //v.getContext().startService(startIntent);
-                //Log.d("SetConnect", "startService executed");
+                Intent startIntent = new Intent(v.getContext(), SocketService.class);
+                startIntent.putExtra("serverIP", medtServerIP.getText().toString());
+                v.getContext().startService(startIntent);
+                Log.d("SetConnect", "startService executed");
+                Toast.makeText(getContext(),"Save OK~",Toast.LENGTH_SHORT).show();
             }
         });
 

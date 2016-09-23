@@ -88,13 +88,7 @@ public class SocketService extends Service {
 
                     output = new byte[]{0x00,0x30};
                     Log.d("service2:", output.toString());
-                    //try {44
 
-                    //} catch (IOException e) {
-                        //Log.d("service:", "NO~~~~~");
-                        //e.printStackTrace();
-                    //}
-                    //socket = new Socket(serverIP, port);
                     // 客户端启动ClientThread线程不断读取来自服务器的数据
                     new Thread(new ClientThread(socket, handler)).start();
                     writer = new PrintStream(socket.getOutputStream());
@@ -139,9 +133,9 @@ public class SocketService extends Service {
             Byte temp;
 
             temp = (byte) volume;
-            Byte datalength = 4;
+            Byte dataLength = 1;
             Log.d("socketSend1",temp.toString());
-            output = new byte[]{VOLUME, 0x31, temp};
+            output = new byte[]{VOLUME, 0x31, dataLength,temp};
             try {
                 writer.write(output);
                 writer.flush();
@@ -154,9 +148,8 @@ public class SocketService extends Service {
 
             temp = (byte) tone;
 
-
             Log.d("socketSend2",temp.toString());
-            output = new byte[]{TONE, 0x31, temp};
+            output = new byte[]{TONE, 0x31, dataLength , temp};
             try {
                 writer.write(output);
                 writer.flush();
@@ -169,7 +162,7 @@ public class SocketService extends Service {
 
             temp = (byte) speed;
             Log.d("socketSend3",temp.toString());
-            output = new byte[]{SPEED, 0x31, temp};
+            output = new byte[]{SPEED, 0x31, dataLength, temp};
             try {
                 writer.write(output);
                 writer.flush();
@@ -183,7 +176,7 @@ public class SocketService extends Service {
 
             temp = (byte)timbre;
             Log.d("socketSend4",temp.toString());
-            output = new byte[]{TIMBRE, 0x31, temp};
+            output = new byte[]{TIMBRE, 0x31, dataLength ,temp};
             try {
                 writer.write(output);
                 writer.flush();
@@ -193,13 +186,6 @@ public class SocketService extends Service {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
-
-
-            //writer.println("Music:" + tone);
-            //writer.println("Music:" + timbre);
-            //writer.println("Music:" + speed);
-
 
         }
     };

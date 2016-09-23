@@ -165,8 +165,9 @@ public class SetBabyInfoFragment extends BaseFragment {
                 data.putInt("month", birthMonth);
                 data.putInt("day", birthDay);
 
-
                 mCallbackBaby.saveBaby(data);
+
+                Toast.makeText(getContext(),"Save OK~",Toast.LENGTH_SHORT).show();
             }
         });
 

@@ -95,7 +95,7 @@ public class MusicActivity extends AppCompatActivity implements
     private Spinner mspinner_timbre, mspinner_speed;
     private ArrayAdapter lunchList_timbre, lunchList_speed;
     private Context mContext;
-    private String[] spn_timbre = {"電子鋼琴", "吉他", "acapella"};
+    private String[] spn_timbre = {"原聲","電子鋼琴", "吉他", "acapella"};
     private String[] spn_speed = {"0.5", "0.75", "正常", "1.5", "2"};
     private Intent intent = new Intent();
     /**
@@ -151,7 +151,7 @@ public class MusicActivity extends AppCompatActivity implements
                 timbrechose = position;
 
                 int test = intent.getIntExtra("timbre",0);
-                Toast.makeText(MusicActivity.this, "TEST timbre: " + test,Toast.LENGTH_LONG).show();
+                Toast.makeText(MusicActivity.this, "TEST timbre: " + timbrechose,Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -166,7 +166,7 @@ public class MusicActivity extends AppCompatActivity implements
                 speedchose = position;
 
                 String test = intent.getStringExtra("speed");
-                Toast.makeText(MusicActivity.this, "speed:" + test, Toast.LENGTH_LONG).show();
+                Toast.makeText(MusicActivity.this, "speed:" + speedchose, Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -294,7 +294,6 @@ public class MusicActivity extends AppCompatActivity implements
 
             Log.d("uriPath", uripath);
 
-
             Log.d("buttonSend","Startsend");
             SendFile sendFile = new SendFile();
             try {
@@ -340,10 +339,10 @@ public class MusicActivity extends AppCompatActivity implements
     public void buttonSave(View view) {
         saveData();
         setResult(RESULT_OK, intent);
-        Toast.makeText(MusicActivity.this, "成功!" + "tim:" + timbre
-                + "spe:" + speed
+        Toast.makeText(MusicActivity.this, "成功!" + "tim:" + timbrechose
+                + "spe:" + speedchose
                 + "ton:" + tone
-                + "vol:" + volume, Toast.LENGTH_LONG).show();
+                + "vol:" + volume, Toast.LENGTH_SHORT).show();
         Intent intent = new Intent("MUSICINFO");
         intent.putExtra("volume", volume);
         intent.putExtra("tone", tone);

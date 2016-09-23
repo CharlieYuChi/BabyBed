@@ -35,4 +35,22 @@
 
     </RelativeLayout>
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/webview"
+        android:layout_margin="20dp">
+
+        <TextView
+            android:id="@+id/txtRecord"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/btn_hangUpBaby"
+            android:layout_centerInParent="true"
+            android:text="準備通話"
+            android:textSize="25dp"/>
+
+    </LinearLayout>
+
+
 </RelativeLayout>

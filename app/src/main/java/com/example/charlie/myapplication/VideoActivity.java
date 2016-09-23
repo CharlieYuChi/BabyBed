@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.charlie.myapplication.setting.*;
@@ -72,10 +73,11 @@ public class VideoActivity extends AppCompatActivity implements
     private static final int REQUEST_MUSIC = 1;
 
     private WebView webview;
+    private TextView mtxtRecord;
 
     //連線用到的變數
     private String Ip = "192.168.0.7";
-    private String serverIp = "";
+    private String serverIp = "192.168.0.130";
     private String brokerPort= "8080";
 
     //學長的function-processConnect()的變數
@@ -90,6 +92,7 @@ public class VideoActivity extends AppCompatActivity implements
     private MediaPlayer mr;
     private String path = "";
     private AudioCapturer ac;
+    private Incall ic;
 
     Intent intent;
     /**
@@ -107,6 +110,7 @@ public class VideoActivity extends AppCompatActivity implements
 
         setEnterSwichLayout();
 
+        mtxtRecord = (TextView) findViewById(R.id.txtRecord);
         webview = (WebView) findViewById(R.id.webview);
         WebSettings webSettings = webview.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -126,14 +130,11 @@ public class VideoActivity extends AppCompatActivity implements
         volume = intent.getIntExtra("volume", 0);
 
 
-        webview.loadUrl("http://"+ Ip +":8080/?action=stream");
-
-
         if (Ip == null) {
             Toast.makeText(this, "IP未設定!!!", Toast.LENGTH_LONG).show();
             Log.d("brokerIP Null", "NULLLLLL");
         } else {
-            webview.loadUrl("http://" + "192.168.0.7" + ":" + brokerPort + "/javascript_simple.html");
+            webview.loadUrl("http://"+ Ip +":8081/?action=stream");
             Log.d("No Null", "NONOONONO");
         }
 
@@ -304,184 +305,43 @@ public class VideoActivity extends AppCompatActivity implements
     //打電話
     public void buttonCallBaby(View view) {
         Thread thread = new Thread(new Runnable() {
-
+            @Override
             public void run() {
-                Log.d("buttonCall","Start!!!!!!!!!!!");
-                //record();
+                byte[] output = new byte[]{0x49, 0x30, 0x00};
 
+                try {
+                    socket = new Socket(serverIp, 8080);
+                    writer = socket.getOutputStream();
+                    writer.write(output);
+                    writer.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                ac = new AudioCapturer(socket);
+                Log.d("Audio", "new Audio");
+                ic = new Incall(socket);
+                ac.startCapture();
+                Log.d("Audio", "start Audio");
+                ic.start();
             }
-
         });
-        thread.start();
 
-        ac = new AudioCapturer();
-        ac.startCapture();
+        thread.start();
+        mtxtRecord.setText("通話中...");
     }
 
     //掛電話
     public void buttonHangup(View view) {
-        isRecording = false;
-        //play();
         ac.stopCapture();
-    }
-
-
-/*
-    public void record() {
-
-        int frequency = 8000;
-        int channelConfiguration =AudioFormat.CHANNEL_IN_MONO;
-        int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
-
-        File file= new File(Environment.getExternalStorageDirectory().getAbsolutePath()+ "/reverseme.pcm");
-
-        // Delete any previousrecording.
-
-        if (file.exists())
-
-            file.delete();
-
-        // Create the new file.
-
+        ic.stop();
         try {
-
-            file.createNewFile();
-
+            socket.close();
         } catch (IOException e) {
-
-            throw new IllegalStateException("Failed to create " + file.toString());
-
+            e.printStackTrace();
         }
-
-        try {
-
-            // Create a DataOuputStream to write the audiodata into the saved file.
-            Log.d("Record", "Record Start~!");
-            //socket = new Socket(serverIp,8080);
-
-            //Log.d("record","socket OK~~");
-
-            OutputStream os = new FileOutputStream(file);
-            //OutputStream os = socket.getOutputStream();
-
-            BufferedOutputStream bos = new BufferedOutputStream(os);
-
-            DataOutputStream dos = new DataOutputStream(bos);
-
-
-            // Create a new AudioRecord object to record theaudio.
-
-            int bufferSize = AudioRecord.getMinBufferSize(frequency,channelConfiguration, audioEncoding);
-
-            AudioRecord audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC,
-
-                    frequency, channelConfiguration,
-
-                    audioEncoding, bufferSize);
-
-
-            short[] buffer = new short[bufferSize];
-
-            audioRecord.startRecording();
-
-            isRecording = true ;
-
-            //byte[] a = new byte[]{0x49, 0x30, 0x00};
-
-            //dos.write(a);
-
-            while (isRecording) {
-
-                int bufferReadResult = audioRecord.read(buffer, 0,bufferSize);
-
-                Log.d("ISRecording", "" +bufferReadResult);
-                for (int i = 0; i < bufferReadResult;i++){
-                    dos.writeShort(buffer[i]);
-                    //dos.flush();
-                }
-
-            }
-
-            audioRecord.stop();
-            dos.close();
-
-        } catch (Throwable t) {
-            Log.e("AudioRecord","Recording Failed");
-        }
-
+        mtxtRecord.setText("準備通話");
     }
 
-    public void play() {
-        // Get the file we want toplayback.
 
-        File file= new File(Environment.getExternalStorageDirectory().getAbsolutePath()+ "/reverseme.pcm");
-        // Get the length of the audio stored in the file(16 bit so 2 bytes per short)
-        // and create a short array to store the recordedaudio.
-
-        int musicLength = (int)(file.length()/2);
-
-        short[] music = new short[musicLength];
-
-
-        try {
-
-            // Create a DataInputStream to read the audio databack from the saved file.
-
-            InputStream is = new FileInputStream(file);
-
-            BufferedInputStream bis = new BufferedInputStream(is);
-
-            DataInputStream dis = new DataInputStream(bis);
-
-            // Read the file into the musicarray.
-
-
-            int i = 0;
-
-            while (dis.available() > 0) {
-
-                music[i] = dis.readShort();
-
-                i++;
-                Log.d("while","" + music[i]);
-
-            }
-
-            // Close the input streams.
-
-            dis.close();
-
-            // Create a new AudioTrack object using the sameparameters as the AudioRecord
-
-            // object used to create thefile.
-
-            Log.d("audio", "start");
-            AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
-
-                    8000,
-
-                    AudioFormat.CHANNEL_IN_MONO,
-
-                    AudioFormat.ENCODING_PCM_16BIT,
-
-                    musicLength*2,
-
-                    AudioTrack.MODE_STREAM);
-
-            // Start playback
-            audioTrack.play();
-            Log.d("play","start");
-            // Write the music buffer to the AudioTrackobject
-            audioTrack.write(music, 0, musicLength);
-
-            Log.d("write","finish");
-            audioTrack.stop() ;
-            Log.d("stop","finish");
-
-        } catch (Throwable t) {
-            Log.e("AudioTrack","Playback Failed");
-        }
-
-    }
-    */
 }
