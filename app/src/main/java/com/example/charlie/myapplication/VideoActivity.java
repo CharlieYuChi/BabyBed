@@ -2,6 +2,7 @@ package com.example.charlie.myapplication;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
@@ -76,9 +77,10 @@ public class VideoActivity extends AppCompatActivity implements
     private TextView mtxtRecord;
 
     //連線用到的變數
-    private String Ip = "192.168.0.7";
-    private String serverIp = "192.168.0.130";
-    private String brokerPort= "8080";
+    private static String videoIp = "";
+    private static String serverIp = "";
+    private String videoPort= "8081";
+    private int serverPort= 8080;
 
     //學長的function-processConnect()的變數
     private static MqttClient mqttClient;
@@ -89,10 +91,14 @@ public class VideoActivity extends AppCompatActivity implements
     //通話變數
     private boolean isRecording = false ;
     private Socket socket;
-    private MediaPlayer mr;
     private String path = "";
     private AudioCapturer ac;
     private Incall ic;
+
+    private SharedPreferences settingsField;
+    private static final String data = "DATA";
+    private static final String ipField = "IP";
+    private static final String serverIpField = "serverIp";
 
     Intent intent;
     /**
@@ -117,11 +123,11 @@ public class VideoActivity extends AppCompatActivity implements
 
         intent = this.getIntent();  //一定要加在onCreate裡,放到外面會壞掉
 
-        Ip = intent.getStringExtra("brokerIP");
-        serverIp = intent.getStringExtra("serverIP");
+        videoIp = intent.getStringExtra("brokerIp");
+        serverIp = intent.getStringExtra("serverIp");
 
-        Log.d(" activity", "bIP:" + Ip);
-        Log.d(" activity", "sIP:" + serverIp);
+        Log.d(" video", "bIP:" + videoIp);
+        Log.d(" video", "sIP:" + serverIp);
 
 
         timbre = intent.getStringExtra("timbre");
@@ -130,11 +136,11 @@ public class VideoActivity extends AppCompatActivity implements
         volume = intent.getIntExtra("volume", 0);
 
 
-        if (Ip == null) {
+        if (videoIp == null) {
             Toast.makeText(this, "IP未設定!!!", Toast.LENGTH_LONG).show();
             Log.d("brokerIP Null", "NULLLLLL");
         } else {
-            webview.loadUrl("http://"+ Ip +":8081/?action=stream");
+            webview.loadUrl("http://"+ videoIp +":"+videoPort+"/baby.html");
             Log.d("No Null", "NONOONONO");
         }
 
@@ -171,7 +177,9 @@ public class VideoActivity extends AppCompatActivity implements
             this.finish();
         } else if (id == R.id.nav_music) {
             intent.setClass(VideoActivity.this, MusicActivity.class);
-            startActivityForResult(intent, REQUEST_MUSIC);
+            intent.putExtra("serverIp", serverIp);
+            intent.putExtra("brokerIp", videoIp);
+            startActivity(intent);
             this.finish();
         } else if (id == R.id.nav_video) {
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_video);
@@ -192,15 +200,11 @@ public class VideoActivity extends AppCompatActivity implements
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_SETTING) {
-                Ip = data.getStringExtra("brokerIp");
-            } else if (requestCode == REQUEST_MUSIC) {
-                volume = data.getIntExtra("volume", 0);
-                tone = data.getIntExtra("tone", 0);
-                timbre = data.getStringExtra("timbre");
-                speed = data.getStringExtra("speed");
+                videoIp = data.getStringExtra("brokerIp");
+                serverIp = data.getStringExtra("serverIp");
+                saveData();
             }
         }
-
     }
 
     @Override
@@ -310,7 +314,7 @@ public class VideoActivity extends AppCompatActivity implements
                 byte[] output = new byte[]{0x49, 0x30, 0x00};
 
                 try {
-                    socket = new Socket(serverIp, 8080);
+                    socket = new Socket(serverIp, serverPort);
                     writer = socket.getOutputStream();
                     writer.write(output);
                     writer.flush();
@@ -319,16 +323,15 @@ public class VideoActivity extends AppCompatActivity implements
                 }
 
                 ac = new AudioCapturer(socket);
-                Log.d("Audio", "new Audio");
                 ic = new Incall(socket);
                 ac.startCapture();
-                Log.d("Audio", "start Audio");
                 ic.start();
             }
         });
 
         thread.start();
         mtxtRecord.setText("通話中...");
+
     }
 
     //掛電話
@@ -341,7 +344,14 @@ public class VideoActivity extends AppCompatActivity implements
             e.printStackTrace();
         }
         mtxtRecord.setText("準備通話");
+
     }
 
-
+    public void saveData(){
+        settingsField = getSharedPreferences(data,0);
+        settingsField.edit()
+                .putString(ipField, videoIp)
+                .putString(serverIpField, serverIp)
+                .apply();
+    }
 }

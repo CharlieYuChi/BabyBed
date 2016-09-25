@@ -41,18 +41,18 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, SwichLayoutInterFace{
 
     //Setting用的變數
-    private String brokerIp;
-    public static String serverIP = "";
-    private String babyName;
-    private String height;
-    private String weight;
+    private static String brokerIp;
+    private static String serverIp = "";
+    private static String babyName;
+    private static String height;
+    private static String weight;
     private int gender;
     private static final int GENDER_BOY = 0;
     private static final int GENDER_GIRL = 1;
     private ImageView genderImg;
-    private int birthYear;
-    private int birthMonth;
-    private int birthDay;
+    private static int birthYear;
+    private static int birthMonth;
+    private static int birthDay;
 
 
     //Music用的變數
@@ -146,7 +146,7 @@ public class MainActivity extends AppCompatActivity
             if (requestCode == REQUEST_SETTING) {
 
                 brokerIp = data.getStringExtra("brokerIp");
-                serverIP = data.getStringExtra("serverIP");
+                serverIp = data.getStringExtra("serverIP");
                 babyName = data.getStringExtra("babyName");
                 height = data.getStringExtra("height");
                 weight = data.getStringExtra("weight");
@@ -156,7 +156,7 @@ public class MainActivity extends AppCompatActivity
                 birthDay = data.getIntExtra("birthDay",0);
 
                 Log.d(" activity", "bIP:" + brokerIp);
-                Log.d(" activity", "sIP:" + serverIP);
+                Log.d(" activity", "sIP:" + serverIp);
                 Log.d(" activity", "name:" + babyName);
                 Log.d(" activity", "hei:" + height);
                 Log.d(" activity", "wei:" + weight);
@@ -223,11 +223,13 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         } else if (id == R.id.nav_music) {
             intent.setClass(MainActivity.this, MusicActivity.class);
+            intent.putExtra("serverIp", serverIp);
+            intent.putExtra("brokerIp", brokerIp);
             startActivityForResult(intent, REQUEST_MUSIC);
         } else if (id == R.id.nav_video) {
             intent.setClass(MainActivity.this, VideoActivity.class);
-            intent.putExtra("brokerIP", brokerIp);
-            intent.putExtra("serverIP", serverIP);
+            intent.putExtra("brokerIp", brokerIp);
+            intent.putExtra("serverIp", serverIp);
             startActivity(intent);
         }  else if (id == R.id.nav_setting){
             intent.setClass(MainActivity.this, com.example.charlie.myapplication.setting.SettingActivity.class);
@@ -256,10 +258,8 @@ public class MainActivity extends AppCompatActivity
             mqttClient.connect(mqttConnectOptions);
             mqttClient.subscribe(TOPIC_STATUS);
 
-            Toast.makeText(this, R.string.connected, Toast.LENGTH_LONG).show();
         }
         catch (MqttException me) {
-            Toast.makeText(this, R.string.connect_failure, Toast.LENGTH_LONG).show();
         }
     }
 

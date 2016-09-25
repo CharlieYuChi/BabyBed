@@ -49,12 +49,12 @@ public class SetBabyInfoFragment extends BaseFragment {
     private static final int GENDER_GIRL = 1;
 
     //生日變數
-    private int birthYear;
-    private int birthMonth;
-    private int birthDay;
+    private static int birthYear;
+    private static int birthMonth;
+    private static int birthDay;
     private TextView medtBirth;
     private ImageButton mbtnBirth;
-    private int mYear, mMonth, mDay;
+    private static int mYear, mMonth, mDay;
 
     private SharedPreferences settingsField;
     private static final String datashared = "DATA";
@@ -138,11 +138,11 @@ public class SetBabyInfoFragment extends BaseFragment {
                 switch (checkedId) {
                     case R.id.rBtn_boy:
                         gender = GENDER_BOY;
-                        Toast.makeText(getActivity(), "" + gender,Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getActivity(), "" + gender,Toast.LENGTH_LONG).show();
                         break;
                     case R.id.rBtn_girl:
                         gender = GENDER_GIRL;
-                        Toast.makeText(getContext(), "" + gender,Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getContext(), "" + gender,Toast.LENGTH_LONG).show();
                         break;
                 }
             }

@@ -1,5 +1,8 @@
 package com.example.charlie.myapplication;
 
+import android.annotation.TargetApi;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -56,6 +60,7 @@ public class SocketService extends Service {
         Log.d("Service", "service executed");
         output = new byte[]{0x00,0x30};
         Log.d("service1:", output.toString());
+
     }
 
     @Override
@@ -67,14 +72,13 @@ public class SocketService extends Service {
             @Override
             public void handleMessage(Message msg) {
                 // 如果消息来自子线程
-                if (msg.what == 0x234) {
-                    // 将读取的内容追加显示在文本框中
-                    //show.append("\n" + msg.obj.toString());
+                if (msg.what == 1) {
+                    Log.d("SocketService", "startCheck");
+                    checkState(msg.obj.toString());
                     Log.d("SocketService", msg.obj.toString());
                 }
             }
         };
-
 
         new Thread(new Runnable() {
             @Override
@@ -89,8 +93,6 @@ public class SocketService extends Service {
                     output = new byte[]{0x00,0x30};
                     Log.d("service2:", output.toString());
 
-                    // 客户端启动ClientThread线程不断读取来自服务器的数据
-                    new Thread(new ClientThread(socket, handler)).start();
                     writer = new PrintStream(socket.getOutputStream());
                     writer.write(output);
 
@@ -100,7 +102,15 @@ public class SocketService extends Service {
                     e.printStackTrace();
                 }
 
-
+                // 客户端启动ClientThread线程不断读取来自服务器的数据
+                try {
+                    Log.d("socketservice", "startend");
+                    new Thread(new ClientThread(socket, handler)).start();
+                    Log.d("socketservice", "startendend");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                /*
                 while (true){
                     try {
                         Thread.sleep(5000);
@@ -109,10 +119,11 @@ public class SocketService extends Service {
                         e.printStackTrace();
                     }
                 }
-
+                */
 
             }
         }).start();
+
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -201,6 +212,10 @@ public class SocketService extends Service {
             }).start();
         }
 
+        public Socket getSocket(){
+
+            return socket;
+        }
     }
 
     @Override
@@ -213,4 +228,40 @@ public class SocketService extends Service {
     public IBinder onBind(Intent intent) {
         return null;
     }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    public void checkState(String content){
+        final int notifyID = 1; // 通知的識別號碼
+        final NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE); // 取得系統的通知服務
+
+        final String THROWUP = "1";
+        final String NOFACE = "2";
+        final String STAND = "3";
+        //吐奶		0x1
+        //找不到臉 	0x2
+        //站立		0x3
+        //加入判斷寶寶狀態
+        Log.d("SocketService", content);
+        Notification notification;
+        switch (content){
+            case THROWUP:
+                notification = new Notification.Builder(getApplicationContext()).setSmallIcon(R.drawable.ic_menu_socket).setContentTitle("危險").setContentText("寶寶吐的一蹋糊塗!").build(); // 建立通知
+                notificationManager.notify(notifyID, notification); // 發送通知
+                break;
+
+            case NOFACE:
+                notification = new Notification.Builder(getApplicationContext()).setSmallIcon(R.drawable.ic_menu_socket).setContentTitle("危險").setContentText("寶寶照不到臉!").build(); // 建立通知
+                notificationManager.notify(notifyID, notification); // 發送通知
+                break;
+
+            case STAND:
+                notification = new Notification.Builder(getApplicationContext()).setSmallIcon(R.drawable.ic_menu_socket).setContentTitle("危險").setContentText("寶寶站起來啦!").build(); // 建立通知
+                notificationManager.notify(notifyID, notification); // 發送通知
+                break;
+
+            default:
+                break;
+        }
+    }
+
 }

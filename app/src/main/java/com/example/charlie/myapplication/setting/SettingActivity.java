@@ -41,18 +41,18 @@ public class SettingActivity extends AppCompatActivity implements
         , SetConnectFragment.callBackConnect, SetBabyInfoFragment.callBackBaby{
 
     //SetConnect的變數
-    private String brokerIp;
+    private static String brokerIp;
     private String brokerPort;
-    private String serverIP;
+    private static String serverIP;
 
     //SetBaby的變數
-    private String name;
-    private String height;
-    private String weight;
-    private int gender;
-    private int birthYear;
-    private int birthMonth;
-    private int birthDay;
+    private static String name;
+    private static String height;
+    private static String weight;
+    private static int gender;
+    private static int birthYear;
+    private static int birthMonth;
+    private static int birthDay;
 
     private SharedPreferences settingsField;
     private static final String data = "DATA";
@@ -178,17 +178,20 @@ public class SettingActivity extends AppCompatActivity implements
         Intent intent = this.getIntent();
 
         if (id == R.id.nav_main){
+            //Log.d("setEnd ", brokerIp);
+            setResult(RESULT_OK, intent);
             setExitSwichLayout();
             this.finish();
         } else if (id == R.id.nav_music) {
             intent.setClass(SettingActivity.this, MusicActivity.class);
-            intent.putExtra("serverIP", serverIP);
+            intent.putExtra("brokerIp", brokerIp);
+            intent.putExtra("serverIp", serverIP);
             startActivity(intent);
             this.finish();
         } else if (id == R.id.nav_video) {
             intent.setClass(SettingActivity.this, VideoActivity.class);
-            intent.putExtra("brokerIP", brokerIp);
-            intent.putExtra("serverIP", serverIP);
+            intent.putExtra("brokerIp", brokerIp);
+            intent.putExtra("serverIp", serverIP);
             startActivity(intent);
             this.finish();
         } else if (id == R.id.nav_setting){

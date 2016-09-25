@@ -178,7 +178,8 @@
                 android:id="@+id/edtBirth"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/default_textSize"/>
+                android:textSize="@dimen/default_textSize"
+                android:inputType="date"/>
 
             <ImageButton
                 android:id="@+id/btnBirth"

@@ -3,17 +3,21 @@ package com.example.charlie.myapplication;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.IBinder;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.renderscript.Sampler;
@@ -52,6 +56,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.URISyntaxException;
@@ -65,14 +70,14 @@ public class MusicActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener, SwichLayoutInterFace {
 
     //Setting用的變數
-    private String brokerIp;
+    private static String brokerIp;
     private String brokerPort;
 
     //Music用的變數
-    private int volume;
-    private int tone;  //1個8 2個8
-    private String timbre;
-    private String speed;
+    private static int volume = 0;
+    private static int tone = 0 ;  //1個8 2個8
+    private static String timbre = "";
+    private static String speed = "";
     int speedchose;
     int timbrechose;
     private SharedPreferences settingsField;
@@ -84,7 +89,7 @@ public class MusicActivity extends AppCompatActivity implements
     private static final String speedField = "正常";
 
     //socket用的變數
-    private String serverIP;
+    private static String serverIp;
 
     //setting的intent要用的
     private static final int REQUEST_SETTING = 0;
@@ -103,8 +108,6 @@ public class MusicActivity extends AppCompatActivity implements
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
     private GoogleApiClient client;
-    private MediaPlayer mp = new MediaPlayer();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,7 +118,11 @@ public class MusicActivity extends AppCompatActivity implements
 
         iniBarComponent();  //初始化AppBar
         intent = this.getIntent();
-        serverIP = intent.getStringExtra("serverIP");
+        serverIp = intent.getStringExtra("serverIp");
+        brokerIp = intent.getStringExtra("brokerIp");
+
+        Log.d("music", "bIP:" + brokerIp);
+        Log.d("music", "sIP:" + serverIp);
 
         final SeekBar volume_bar = (SeekBar) findViewById(R.id.seekbar_volume);
         final SeekBar tone_bar = (SeekBar) findViewById(R.id.seekbar_tone);
@@ -151,7 +158,7 @@ public class MusicActivity extends AppCompatActivity implements
                 timbrechose = position;
 
                 int test = intent.getIntExtra("timbre",0);
-                Toast.makeText(MusicActivity.this, "TEST timbre: " + timbrechose,Toast.LENGTH_SHORT).show();
+                //Toast.makeText(MusicActivity.this, "TEST timbre: " + timbrechose,Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -166,7 +173,7 @@ public class MusicActivity extends AppCompatActivity implements
                 speedchose = position;
 
                 String test = intent.getStringExtra("speed");
-                Toast.makeText(MusicActivity.this, "speed:" + speedchose, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(MusicActivity.this, "speed:" + speedchose, Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -223,11 +230,15 @@ public class MusicActivity extends AppCompatActivity implements
             }
         });
 
+
         //readData();
+
         setEnterSwichLayout();
+
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+
     }
 
     //初始化AppBar
@@ -262,20 +273,12 @@ public class MusicActivity extends AppCompatActivity implements
             drawer.closeDrawer(GravityCompat.START);
         } else if (id == R.id.nav_video) {
             intent.setClass(MusicActivity.this, VideoActivity.class);
-            intent.putExtra("serverIP", serverIP);
-            intent.putExtra("volume", volume);
-            intent.putExtra("tone", tone);
-            intent.putExtra("timbre", timbre);
-            intent.putExtra("speed", speed);
+            intent.putExtra("serverIp", serverIp);
+            intent.putExtra("brokerIp", brokerIp);
             startActivity(intent);
             this.finish();
         } else if (id == R.id.nav_setting) {
             intent.setClass(MusicActivity.this, SettingActivity.class);
-            intent.putExtra("serverIP", serverIP);
-            intent.putExtra("volume", volume);
-            intent.putExtra("tone", tone);
-            intent.putExtra("timbre", timbre);
-            intent.putExtra("speed", speed);
             startActivityForResult(intent, REQUEST_SETTING);
             this.finish();
         }
@@ -290,25 +293,35 @@ public class MusicActivity extends AppCompatActivity implements
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
             Uri uri = data.getData();
-            String uripath = ImageFilePath.getPath(this, uri);
+            final String uripath = ImageFilePath.getPath(this, uri);
 
             Log.d("uriPath", uripath);
 
             Log.d("buttonSend","Startsend");
-            SendFile sendFile = new SendFile();
-            try {
-                sendFile.sendFile(uripath,serverIP);
-            } catch (IOException e) {
+            final SendFile sendFile = new SendFile();
+            Thread th = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        sendFile.sendFile(uripath,serverIp);
+                    } catch (InterruptedIOException e1){
+                        Log.d("Thread","end");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
 
-            }
+            th.start();
+
             Log.d("buttonSend","Endsend");
-            Toast.makeText(this,"傳送完成^^",Toast.LENGTH_LONG).show();
+            Toast.makeText(this,"傳送完成^^",Toast.LENGTH_SHORT).show();
+
         }
 
 
         if (requestCode == REQUEST_SETTING) {
             brokerIp = data.getStringExtra("brokerIp");
-            brokerPort = data.getStringExtra("brokerPort");
 
         } else if (requestCode == REQUEST_MUSIC) {
 
@@ -337,7 +350,7 @@ public class MusicActivity extends AppCompatActivity implements
     }
 
     public void buttonSave(View view) {
-        saveData();
+        //saveData();
         setResult(RESULT_OK, intent);
         Toast.makeText(MusicActivity.this, "成功!" + "tim:" + timbrechose
                 + "spe:" + speedchose
@@ -355,7 +368,6 @@ public class MusicActivity extends AppCompatActivity implements
     public void buttonSend(View view) {
         Log.d("FileDir", String.valueOf(mContext.getFilesDir()));
         fileBrowserIntent();
-
     }
 
     // 外部 App 回傳結果的類型判斷碼
@@ -373,7 +385,7 @@ public class MusicActivity extends AppCompatActivity implements
             startActivityForResult( Intent.createChooser(intent, "選擇字型"), FILE_SELECT_CODE );
         } catch (android.content.ActivityNotFoundException ex) {
             // 若使用者沒有安裝檔案瀏覽器的 App 則顯示提示訊息
-            Toast.makeText(this, "沒有檔案瀏覽器 是沒辦法選擇字型的", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "沒有檔案瀏覽器 是沒辦法選擇字型的", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -406,24 +418,21 @@ public class MusicActivity extends AppCompatActivity implements
         tone = Integer.valueOf(settingsField.getString(toneField, ""));
         speed = settingsField.getString(speedField, "");
         timbre = settingsField.getString(timbreField, "");
-        //Toast.makeText(this, "RVF" + Integer.valueOf(settingsField.getString(volumeField, "")), Toast.LENGTH_LONG).show();
-        //Toast.makeText(this, "RTF" + Integer.valueOf(settingsField.getString(toneField, "")), Toast.LENGTH_LONG).show();
+
     }
 
     public void saveData() {
         String volTemp = Integer.toString(volume);
         String toneTemp = Integer.toString(tone);
-        settingsField = getSharedPreferences(data2, 0);
+        settingsField = getSharedPreferences(data, 0);
         settingsField.edit()
                 .putString(volumeField, volTemp)
                 .putString(speedField, speed)
                 .putString(timbreField, timbre)
                 .apply();
-        settingsField = getSharedPreferences(data2, 0);
         settingsField.edit().putString(toneField, toneTemp).apply();
-        //Toast.makeText(this, "VF" + settingsField.getString(volumeField,""), Toast.LENGTH_LONG).show();
 
-        //Toast.makeText(this, "TF" + settingsField.getString(toneField,""), Toast.LENGTH_LONG).show();
+        Log.d("saveData", "volTemp: " + volTemp + "setfield: " + settingsField.getString(volumeField,""));
     }
 
     @Override

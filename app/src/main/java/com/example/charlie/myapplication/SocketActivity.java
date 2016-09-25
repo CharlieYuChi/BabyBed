@@ -168,7 +168,7 @@ public class SocketActivity extends AppCompatActivity implements
         Intent intent = this.getIntent();
 
         if (id == R.id.nav_main){
-            MainActivity.serverIP = serverIP;
+            //MainActivity.serverIp = serverIP;
             //Toast.makeText(this, "socketPutserver:" + MainActivity.serverIP,Toast.LENGTH_LONG).show();
 
             setExitSwichLayout();
