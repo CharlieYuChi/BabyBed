@@ -11,12 +11,13 @@
         android:layout_margin="3dp"
         android:paddingTop="8dp" />
 
-    <RelativeLayout
+
+    <LinearLayout
+        android:id="@+id/videobutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
         android:layout_below="@+id/webview"
-        android:padding="10dp">
+        android:layout_centerHorizontal="true">
 
         <ImageButton
             android:id="@+id/btn_callBaby"
@@ -29,28 +30,26 @@
             android:id="@+id/btn_hangUpBaby"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/btn_callBaby"
             android:src="@drawable/ic_hangupbaby"
             android:onClick="buttonHangup"/>
 
-    </RelativeLayout>
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/webview"
-        android:layout_margin="20dp">
+        <ImageButton
+            android:layout_width="65sp"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_listenbaby"
+            android:onClick="buttonListenBaby"/>
 
-        <TextView
-            android:id="@+id/txtRecord"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/btn_hangUpBaby"
-            android:layout_centerInParent="true"
-            android:text="準備通話"
-            android:textSize="25dp"/>
 
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/txtRecord"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/videobutton"
+        android:layout_centerHorizontal="true"
+        android:text="準備通話"
+        android:textSize="25dp"/>
 
 </RelativeLayout>

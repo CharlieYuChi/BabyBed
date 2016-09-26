@@ -31,6 +31,7 @@ public class ClientThread implements Runnable {
             int temp;
             byte[] header = new byte[3];
 
+
             // 不断读取Socket输入流的内容
             Log.d("client", "while");
             //while((content = br.readLine())!=null){
@@ -40,9 +41,15 @@ public class ClientThread implements Runnable {
                 if (temp != -1) {
                     Log.d("client", ""+header);
 
+                    int length = (int)getLength(header);
+
+                    byte[] content = new byte[length];
+                    temp = br.read(content);
+
+                    Log.d("client: ", "content: "+ content[0]);
                     Message msg = new Message();
                     msg.what = 1;
-                    msg.obj = header                                                                                                                                                ;
+                    msg.obj = content[0];                                                                                                                                                ;
                     handler.sendMessage(msg);
                     Log.d("client", "handlersend");
                 }
@@ -54,7 +61,10 @@ public class ClientThread implements Runnable {
         Log.d("client", "endrun");
     }
 
-    public Byte getLength(Byte[] header){
+    public Byte getLength(byte[] header){
+        byte length;
+        length = header[2];
 
+        return length;
     }
 }

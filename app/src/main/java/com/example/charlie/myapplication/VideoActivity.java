@@ -336,7 +336,9 @@ public class VideoActivity extends AppCompatActivity implements
 
     //掛電話
     public void buttonHangup(View view) {
-        ac.stopCapture();
+        if(ac.isCaptureStarted() == true){
+            ac.stopCapture();
+        }
         ic.stop();
         try {
             socket.close();
@@ -354,4 +356,31 @@ public class VideoActivity extends AppCompatActivity implements
                 .putString(serverIpField, serverIp)
                 .apply();
     }
+
+
+    public void buttonListenBaby(View view) {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                byte[] output = new byte[]{0x49, 0x30, 0x00};
+
+                try {
+                    socket = new Socket(serverIp, serverPort);
+                    writer = socket.getOutputStream();
+                    writer.write(output);
+                    writer.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                ic = new Incall(socket);
+                ic.start();
+            }
+        });
+
+        thread.start();
+        mtxtRecord.setText("通話中...");
+
+    }
+
 }
