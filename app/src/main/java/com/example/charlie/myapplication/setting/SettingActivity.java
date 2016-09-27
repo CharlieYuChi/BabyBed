@@ -95,7 +95,7 @@ public class SettingActivity extends AppCompatActivity implements
         intent.putExtra("brokerIp", brokerIp);
         intent.putExtra("serverIP", serverIP);
 
-        saveData();
+        saveConnectData();
         setResult(RESULT_OK, intent);
     }
 
@@ -128,7 +128,7 @@ public class SettingActivity extends AppCompatActivity implements
         intent.putExtra("birthMonth", birthMonth);
         intent.putExtra("birthDay", birthDay);
 
-        saveData();
+        saveBabyData();
         setResult(RESULT_OK, intent);
     }
 
@@ -166,7 +166,6 @@ public class SettingActivity extends AppCompatActivity implements
             TabFragment fragment = new TabFragment();
             transaction.replace(R.id.setting_content_fragment, fragment);
             transaction.commit();
-
         }
     }
 
@@ -179,6 +178,14 @@ public class SettingActivity extends AppCompatActivity implements
 
         if (id == R.id.nav_main){
             //Log.d("setEnd ", brokerIp);
+            intent.putExtra("babyName", name);
+            intent.putExtra("height", height);
+            intent.putExtra("weight", weight);
+
+            intent.putExtra("gender", gender);
+            intent.putExtra("birthYear", birthYear);
+            intent.putExtra("birthMonth", birthMonth);
+            intent.putExtra("birthDay", birthDay);
             setResult(RESULT_OK, intent);
             setExitSwichLayout();
             this.finish();
@@ -218,11 +225,17 @@ public class SettingActivity extends AppCompatActivity implements
         Log.d("setting activity", "day:" + birthDay);
     }
 
-    public void saveData(){
+    public void saveConnectData(){
         settingsField = getSharedPreferences(data,0);
         settingsField.edit()
                 .putString(ipField, brokerIp)
                 .putString(serverIPField, serverIP)
+                .apply();
+    }
+
+    public void saveBabyData(){
+        settingsField = getSharedPreferences(data,0);
+        settingsField.edit()
                 .putString(nameField, name)
                 .putString(heightField, height)
                 .putString(weightField, weight)
@@ -231,6 +244,7 @@ public class SettingActivity extends AppCompatActivity implements
                 .putInt(birthMonthField, birthMonth)
                 .putInt(birthDayField, birthDay)
                 .apply();
+
     }
 
 

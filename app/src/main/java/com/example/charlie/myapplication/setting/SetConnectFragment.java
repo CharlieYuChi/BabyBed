@@ -51,13 +51,11 @@ public class SetConnectFragment extends BaseFragment{
     }
 
     public static SetConnectFragment newInstance(String title, int indicatorColor, int dividerColor, int iconResId) {
-
         SetConnectFragment f = new SetConnectFragment();
         f.setTitle(title);
         f.setIndicatorColor(indicatorColor);
         f.setDividerColor(dividerColor);
         //f.setIconResId(iconResId);
-
 
         //pass data
         Bundle args = new Bundle();
@@ -72,7 +70,6 @@ public class SetConnectFragment extends BaseFragment{
         super.onCreate(savedInstanceState);
         //get data
         title = getArguments().getString(DATA_NAME);
-
     }
 
     @Override
@@ -87,7 +84,6 @@ public class SetConnectFragment extends BaseFragment{
 
         mOkbtn = (ImageButton) v.findViewById(R.id.OKbtn);
 
-
         //設定按鈕按下去就傳送資料給SettingActivity
         mOkbtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,12 +91,12 @@ public class SetConnectFragment extends BaseFragment{
                 mCallbackConnect.saveConnect(medtIP.getText().toString(), medtServerIP.getText().toString());
                 Intent startIntent = new Intent(v.getContext(), SocketService.class);
                 startIntent.putExtra("serverIP", medtServerIP.getText().toString());
+                Log.d("serverIP",startIntent.getStringExtra("serverIP"));
                 v.getContext().startService(startIntent);
                 Log.d("SetConnect", "startService executed");
                 Toast.makeText(getContext(),"Save OK~",Toast.LENGTH_SHORT).show();
             }
         });
-
 
         return v;
     }
@@ -109,35 +105,26 @@ public class SetConnectFragment extends BaseFragment{
         settingsField = this.getActivity().getSharedPreferences(data,0);
         medtIP.setText(settingsField.getString(ipField, ""));
         medtServerIP.setText(settingsField.getString(serverIPField, ""));
-
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
     }
 
     @Override
     public void onDestroy() {
-
         super.onDestroy();
     }
 
-
-
     @Override
     public void onDestroyView() {
-
         super.onDestroyView();
     }
-
-
 
 }

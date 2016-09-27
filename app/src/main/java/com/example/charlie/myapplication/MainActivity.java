@@ -6,6 +6,11 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Icon;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -204,7 +209,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    @TargetApi(Build.VERSION_CODES.M)
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -213,9 +218,22 @@ public class MainActivity extends AppCompatActivity
         Intent intent = new Intent();
 
         if (id == R.id.nav_main){
+            // 建立大圖示需要的Bitmap物件
+            Bitmap largeIcon = BitmapFactory.decodeResource(
+                    getResources(), R.drawable.ic_babydead);
+            long[] vibrate_effect =
+                    {1000, 500, 1000, 400, 1000, 300, 1000, 200, 1000, 100};
+            final Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION); // 通知音效的URI，在這裡使用系統內建的通知音效
+
             final int notifyID = 1; // 通知的識別號碼
             final NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE); // 取得系統的通知服務
-            final Notification notification = new Notification.Builder(getApplicationContext()).setSmallIcon(R.drawable.ic_menu_socket).setContentTitle("內容標題").setContentText("內容文字").build(); // 建立通知
+            final Notification notification = new Notification.Builder(getApplicationContext())
+                    .setSmallIcon(R.drawable.ic_babydead)
+                    .setContentTitle("危險")
+                    .setContentText("寶寶吐的一蹋糊塗!")
+                    .setVibrate(vibrate_effect)
+                    .setSound(soundUri)
+                    .build(); // 建立通知
             notificationManager.notify(notifyID, notification); // 發送通知
             //https://magiclen.org/android-notifications/
 

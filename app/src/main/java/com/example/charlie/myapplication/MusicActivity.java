@@ -28,6 +28,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.ExploreByTouchHelper;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -35,6 +36,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.Spinner;
@@ -108,6 +110,9 @@ public class MusicActivity extends AppCompatActivity implements
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
     private GoogleApiClient client;
+    private final Boolean INTERACTIVE = true;
+    private final Boolean NORMAL = false;
+    private TextView mtxtControlMusic;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,6 +138,30 @@ public class MusicActivity extends AppCompatActivity implements
         mContext = this.getApplicationContext();
         mspinner_timbre = (Spinner) findViewById(R.id.spinner_timbre);
         mspinner_speed = (Spinner) findViewById(R.id.spinner_speed);
+
+        mtxtControlMusic = (TextView) findViewById(R.id.txtControlMusic);
+
+        final SwitchCompat switchCompat = (SwitchCompat) findViewById(R.id.switch_compat);
+
+        switchCompat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked == INTERACTIVE){
+                    Log.d("interactive","mode1");
+                    Intent intent = new Intent("MUSICMODE");
+                    intent.putExtra("mode", 1);
+                    sendBroadcast(intent);
+                    switchCompat.setText("互動模式");
+
+                }else if(isChecked == NORMAL){
+                    Log.d("normal","mode2");
+                    Intent intent = new Intent("MUSICMODE");
+                    intent.putExtra("mode", 0);
+                    sendBroadcast(intent);
+                    switchCompat.setText("普通模式");
+                }
+            }
+        });
 
         //readData();
 
@@ -309,6 +338,7 @@ public class MusicActivity extends AppCompatActivity implements
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+
                 }
             });
 
@@ -491,6 +521,26 @@ public class MusicActivity extends AppCompatActivity implements
         );
         AppIndex.AppIndexApi.end(client, viewAction);
         client.disconnect();
+    }
+
+    public void buttonPlayMusic(View view) {
+        Log.d("BUTTONPLAY","playmusic");
+        Intent intent = new Intent("MUSICCONTROL");
+        intent.putExtra("control", 1);
+        sendBroadcast(intent);
+        mtxtControlMusic.setText("播放中~");
+    }
+
+    public void buttonStopMusic(View view) {
+        Log.d("BUTTONSTOP","stopmusic");
+        Intent intent = new Intent("MUSICCONTROL");
+        intent.putExtra("control", 0);
+        sendBroadcast(intent);
+        mtxtControlMusic.setText("準備播放");
+    }
+
+    public void buttonPlaylist(View view) {
+        Toast.makeText(MusicActivity.this, "歌單~~",Toast.LENGTH_SHORT).show();
     }
 
     /*如果想自定义特效动画时长的话，请在此四个变量对应设置 SwitchLayout.animDuration = 1000;

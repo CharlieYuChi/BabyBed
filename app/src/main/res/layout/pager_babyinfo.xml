@@ -193,15 +193,17 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:paddingRight="10dp"
             android:paddingTop="5dp">
 
             <ImageButton
                 android:id="@+id/OKbtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_margin="10dp"
                 android:src="@drawable/ic_setting_check"
                 android:onClick="buttonClick"
-                android:background="@color/white"
+                android:background="@color/transparent"
                 android:layout_alignParentRight="true"/>
 
         </RelativeLayout>

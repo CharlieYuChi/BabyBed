@@ -16,6 +16,8 @@
         android:id="@+id/videobutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:layout_margin="10dp"
         android:layout_below="@+id/webview"
         android:layout_centerHorizontal="true">
 
@@ -23,23 +25,28 @@
             android:id="@+id/btn_callBaby"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:background="@color/transparent"
             android:src="@drawable/ic_callbaby"
             android:onClick="buttonCallBaby"/>
 
         <ImageButton
-            android:id="@+id/btn_hangUpBaby"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:background="@color/transparent"
             android:src="@drawable/ic_hangupbaby"
             android:onClick="buttonHangup"/>
 
 
         <ImageButton
+            android:id="@+id/btn_listenBaby"
             android:layout_width="65sp"
             android:layout_height="match_parent"
+            android:padding="10dp"
+            android:background="@color/transparent"
             android:src="@drawable/ic_listenbaby"
             android:onClick="buttonListenBaby"/>
-
 
     </LinearLayout>
 
@@ -50,6 +57,7 @@
         android:layout_below="@+id/videobutton"
         android:layout_centerHorizontal="true"
         android:text="準備通話"
-        android:textSize="25dp"/>
+        android:textSize="25dp"
+        android:textColor="@color/blueTxt"/>
 
 </RelativeLayout>

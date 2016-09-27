@@ -9,6 +9,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
@@ -46,6 +48,7 @@ public class SocketService extends Service {
     int timbre;
     int speed;
     Socket socket;
+    boolean socketConnectSuccess = false;
 
     @Override
     public void onDestroy() {
@@ -56,6 +59,9 @@ public class SocketService extends Service {
     public void onCreate() {
         super.onCreate();
         registerReceiver(receiverMusic, new IntentFilter("MUSICINFO"));
+        registerReceiver(receiverMusicControl, new IntentFilter("MUSICCONTROL"));
+        registerReceiver(receiverMusicMode, new IntentFilter("MUSICMODE"));
+
         output = new byte[]{};
         Log.d("Service", "service executed");
         output = new byte[]{0x00,0x30};
@@ -65,8 +71,9 @@ public class SocketService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        bundle = intent.getExtras();
-        serverIP = bundle.getString("serverIP");
+        serverIP = intent.getStringExtra("serverIP");
+
+        Log.d("socketsocket",serverIP);
 
         handler = new Handler() {
             @Override
@@ -104,9 +111,15 @@ public class SocketService extends Service {
 
                 // 客户端启动ClientThread线程不断读取来自服务器的数据
                 try {
-                    Log.d("socketservice", "startend");
-                    new Thread(new ClientThread(socket, handler)).start();
-                    Log.d("socketservice", "startendend");
+                    if(socket != null){
+                        socketConnectSuccess = true;
+                        Log.d("socketservice", "startend");
+                        new Thread(new ClientThread(socket, handler)).start();
+                        Log.d("socketservice", "startendend");
+                    }else {
+                        Log.d("socketservice", "SOCKetnoconnect");
+                    }
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -124,8 +137,70 @@ public class SocketService extends Service {
             }
         }).start();
 
+        if (socketConnectSuccess == false){
+            Toast.makeText(SocketService.this, "未連接到伺服器",Toast.LENGTH_SHORT).show();
+        }
+
         return super.onStartCommand(intent, flags, startId);
     }
+
+    public BroadcastReceiver receiverMusicControl = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final int PLAY_MUSIC = 1;
+            final int STOP_MUSIC = 0;
+            int control = intent.getIntExtra("control",0);
+
+            if(control == PLAY_MUSIC){
+                Log.d("PLAYPLAY","playmusic");
+                Byte dataLength = 1;
+                Log.d("socketSend1",""+control);
+                output = new byte[]{};
+                try {
+                    writer.write(output);
+                    writer.flush();
+                    Thread.sleep(500);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }else if(control == STOP_MUSIC){
+                Log.d("STOPSTOP","stopmusic");
+            }
+
+        }
+    };
+
+    public BroadcastReceiver receiverMusicMode = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final int INTERACTIVE = 1;
+            final int NORMAL = 0;
+            int control = intent.getIntExtra("mode",0);
+
+            if(control == INTERACTIVE){
+                Log.d("PLAYPLAY","playmusic");
+                Byte dataLength = 1;
+                Log.d("socketSend1",""+control);
+                output = new byte[]{};
+                try {
+                    writer.write(output);
+                    writer.flush();
+                    Thread.sleep(500);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }else if(control == NORMAL){
+                Log.d("STOPSTOP","stopmusic");
+            }
+
+        }
+    };
 
     public BroadcastReceiver receiverMusic = new BroadcastReceiver() {
         //01 0011 0001
@@ -240,22 +315,45 @@ public class SocketService extends Service {
         //吐奶		0x1
         //找不到臉 	0x2
         //站立		0x3
+        // 建立震動效果，陣列中元素依序為停止、震動的時間，單位是毫秒
+        long[] vibrate_effect =
+                {1000, 500, 1000, 400, 1000, 300, 1000, 200, 1000, 100};
+        final Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION); // 通知音效的URI，在這裡使用系統內建的通知音效
+
         //加入判斷寶寶狀態
         Log.d("SocketService", content);
         Notification notification;
         switch (content){
             case THROWUP:
-                notification = new Notification.Builder(getApplicationContext()).setSmallIcon(R.drawable.ic_menu_socket).setContentTitle("危險").setContentText("寶寶吐的一蹋糊塗!").build(); // 建立通知
+                notification = new Notification.Builder(getApplicationContext())
+                        .setSmallIcon(R.drawable.ic_babydead)
+                        .setContentTitle("危險")
+                        .setContentText("寶寶吐的一蹋糊塗!")
+                        .setVibrate(vibrate_effect)
+                        .setSound(soundUri)
+                        .build(); // 建立通知
                 notificationManager.notify(notifyID, notification); // 發送通知
                 break;
 
             case NOFACE:
-                notification = new Notification.Builder(getApplicationContext()).setSmallIcon(R.drawable.ic_menu_socket).setContentTitle("危險").setContentText("寶寶照不到臉!").build(); // 建立通知
+                notification = new Notification.Builder(getApplicationContext())
+                        .setSmallIcon(R.drawable.ic_babydead)
+                        .setContentTitle("危險")
+                        .setContentText("寶寶照不到臉!")
+                        .setVibrate(vibrate_effect)
+                        .setSound(soundUri)
+                        .build(); // 建立通知
                 notificationManager.notify(notifyID, notification); // 發送通知
                 break;
 
             case STAND:
-                notification = new Notification.Builder(getApplicationContext()).setSmallIcon(R.drawable.ic_menu_socket).setContentTitle("危險").setContentText("寶寶站起來啦!").build(); // 建立通知
+                notification = new Notification.Builder(getApplicationContext())
+                        .setSmallIcon(R.drawable.ic_babydead)
+                        .setContentTitle("危險")
+                        .setContentText("寶寶站起來啦!")
+                        .setVibrate(vibrate_effect)
+                        .setSound(soundUri)
+                        .build(); // 建立通知
                 notificationManager.notify(notifyID, notification); // 發送通知
                 break;
 

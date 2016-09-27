@@ -42,6 +42,7 @@ public class AudioCapturer {
     public AudioCapturer(Socket socket){
         sc = socket;
     }
+
     public interface OnAudioFrameCapturedListener {
         public void onAudioFrameCaptured(byte[] audioData);
     }
@@ -65,7 +66,6 @@ public class AudioCapturer {
             Log.e(TAG, "Capture already started !");
             return false;
         }
-
 
         mMinBufferSize = AudioRecord.getMinBufferSize(sampleRateInHz,channelConfig,audioFormat);
         Log.e(TAG,""+mMinBufferSize);

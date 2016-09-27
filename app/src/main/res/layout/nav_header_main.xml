@@ -14,8 +14,10 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/nav_header_vertical_spacing"
+        android:paddingTop="0dp"
         android:text="嬰兒床"
+        android:textSize="@dimen/default_textSize"
+
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
 </LinearLayout>

@@ -22,6 +22,7 @@ public class Incall {
     AudioFormat af;
 
     private Thread mIncallThread;
+    private boolean mIsCaptureStarted = false;
     private volatile boolean mIsLoopExit = false;
 
     public Incall(Socket socket) {
@@ -31,6 +32,10 @@ public class Incall {
             e.printStackTrace();
         }
         buf = new byte [4000];
+    }
+
+    public boolean isCaptureStarted() {
+        return mIsCaptureStarted;
     }
 
     public void start(){
@@ -45,6 +50,7 @@ public class Incall {
         mIncallThread = new Thread(new IncallRunnable());
         mIncallThread.start();
 
+        mIsCaptureStarted = true;
     }
 
     public void stop(){

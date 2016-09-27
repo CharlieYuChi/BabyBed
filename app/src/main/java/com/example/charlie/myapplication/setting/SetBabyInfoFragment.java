@@ -110,7 +110,6 @@ public class SetBabyInfoFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.pager_babyinfo, container, false);
 
-
         medtName = (EditText) view.findViewById(R.id.edtName);
         medtHeight = (EditText) view.findViewById(R.id.edtHeight);
         medtWeight = (EditText) view.findViewById(R.id.edtWeight);

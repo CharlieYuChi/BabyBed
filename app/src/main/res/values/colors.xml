@@ -27,6 +27,9 @@
     <color name="blueBarTxT">#0A8BFF</color>
 
     <color name="white">#FFFFFFFF</color>
+    <color name="grey">#BEBEBE</color>
+    <color name="indigo">#4b0082</color>
+    <color name="transparent">#00000000</color>
 
 
 

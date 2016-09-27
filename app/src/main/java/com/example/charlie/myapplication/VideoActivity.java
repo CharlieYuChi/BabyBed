@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -94,7 +95,8 @@ public class VideoActivity extends AppCompatActivity implements
     private String path = "";
     private AudioCapturer ac;
     private Incall ic;
-
+    private ImageButton mbtn_callBaby;
+    private ImageButton mbtn_listenBaby;
     private SharedPreferences settingsField;
     private static final String data = "DATA";
     private static final String ipField = "IP";
@@ -116,6 +118,8 @@ public class VideoActivity extends AppCompatActivity implements
 
         setEnterSwichLayout();
 
+        mbtn_callBaby = (ImageButton) findViewById(R.id.btn_callBaby);
+        mbtn_listenBaby = (ImageButton) findViewById(R.id.btn_listenBaby);
         mtxtRecord = (TextView) findViewById(R.id.txtRecord);
         webview = (WebView) findViewById(R.id.webview);
         WebSettings webSettings = webview.getSettings();
@@ -137,7 +141,7 @@ public class VideoActivity extends AppCompatActivity implements
 
 
         if (videoIp == null) {
-            Toast.makeText(this, "IP未設定!!!", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "IP未設定!!!", Toast.LENGTH_SHORT).show();
             Log.d("brokerIP Null", "NULLLLLL");
         } else {
             webview.loadUrl("http://"+ videoIp +":"+videoPort+"/baby.html");
@@ -322,31 +326,54 @@ public class VideoActivity extends AppCompatActivity implements
                     e.printStackTrace();
                 }
 
-                ac = new AudioCapturer(socket);
-                ic = new Incall(socket);
-                ac.startCapture();
-                ic.start();
+                if(socket != null){
+                    ac = new AudioCapturer(socket);
+                    ic = new Incall(socket);
+
+                    ac.startCapture();
+                    ic.start();
+                    mtxtRecord.setText("通話中...");
+                    mbtn_listenBaby.setEnabled(false);
+                }
             }
         });
 
         thread.start();
-        mtxtRecord.setText("通話中...");
+
+        if(socket == null){
+            Toast.makeText(VideoActivity.this, "未連線", Toast.LENGTH_SHORT).show();
+        }
 
     }
 
     //掛電話
     public void buttonHangup(View view) {
-        if(ac.isCaptureStarted() == true){
-            ac.stopCapture();
+
+        if(ac != null){
+            if(ac.isCaptureStarted() == true){
+                ac.stopCapture();
+            }
         }
-        ic.stop();
+
+        if(ic != null){
+            if(ic.isCaptureStarted() == true){
+                ic.stop();
+            }
+        }
+
         try {
-            socket.close();
+            if(socket != null){
+                socket.close();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
         mtxtRecord.setText("準備通話");
-
+        mbtn_listenBaby.setEnabled(true);
+        mbtn_callBaby.setEnabled(true);
+        if(socket == null){
+            Toast.makeText(VideoActivity.this, "未連線", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void saveData(){
@@ -373,14 +400,20 @@ public class VideoActivity extends AppCompatActivity implements
                     e.printStackTrace();
                 }
 
-                ic = new Incall(socket);
-                ic.start();
+                if(socket != null){
+                    ic = new Incall(socket);
+                    ic.start();
+                    mtxtRecord.setText("通話中...");
+                    mbtn_callBaby.setEnabled(false);
+                }
             }
         });
 
         thread.start();
-        mtxtRecord.setText("通話中...");
 
+        if(socket == null){
+            Toast.makeText(VideoActivity.this, "未連線", Toast.LENGTH_SHORT).show();
+        }
     }
 
 }
