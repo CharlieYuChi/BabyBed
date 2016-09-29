@@ -19,6 +19,8 @@ import android.util.Log;
 public class ClientThread implements Runnable {
     private Handler handler;
     private DataInputStream br = null;
+    private final byte DANGER = 0x0C;
+    private final byte MODE = 0x00;
 
     public ClientThread(Socket socket, Handler handler) throws IOException {
         this.handler = handler;
@@ -30,7 +32,7 @@ public class ClientThread implements Runnable {
         try {
             int temp;
             byte[] header = new byte[3];
-
+            byte type;
 
             // 不断读取Socket输入流的内容
             Log.d("client", "while");
@@ -41,17 +43,35 @@ public class ClientThread implements Runnable {
                 if (temp != -1) {
                     Log.d("client", ""+header);
 
-                    int length = (int)getLength(header);
+                    type = (byte) (header[0]&0x3F);
 
-                    byte[] content = new byte[length];
-                    temp = br.read(content);
+                    if(type == DANGER){
+                        Log.d("DANGERDANGER", "GGBABYGGGG");
+                        int length = (int)getLength(header);
 
-                    Log.d("client: ", "content: "+ content[0]);
-                    Message msg = new Message();
-                    msg.what = 1;
-                    msg.obj = content[0];                                                                                                                                                ;
-                    handler.sendMessage(msg);
-                    Log.d("client", "handlersend");
+                        byte[] content = new byte[length];
+                        temp = br.read(content);
+
+                        Log.d("client: ", "content: "+ content[0]);
+                        Message msg = new Message();
+                        msg.what = 1;
+                        msg.obj = content[0];                                                                                                                                                ;
+                        handler.sendMessage(msg);
+                        Log.d("client", "handlersend");
+                    } else if(type == MODE){
+                        Log.d("MODEMODE", "CHANGE");
+                        int length = (int)getLength(header);
+
+                        byte[] content = new byte[length];
+                        temp = br.read(content);
+
+                        Log.d("client: ", "content: "+ content[0]);
+                        Message msg = new Message();
+                        msg.what = 1;
+                        msg.obj = content[0];                                                                                                                                                ;
+                        handler.sendMessage(msg);
+                        Log.d("client", "handlersend");
+                    }
                 }
             }
         } catch (Exception e) {

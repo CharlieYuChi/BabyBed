@@ -332,15 +332,18 @@ public class VideoActivity extends AppCompatActivity implements
 
                     ac.startCapture();
                     ic.start();
-                    mtxtRecord.setText("通話中...");
-                    mbtn_listenBaby.setEnabled(false);
+
+
                 }
             }
         });
 
         thread.start();
 
-        if(socket == null){
+        if(socket != null){
+            mtxtRecord.setText("通話中...");
+            mbtn_listenBaby.setEnabled(false);
+        }else if(socket == null){
             Toast.makeText(VideoActivity.this, "未連線", Toast.LENGTH_SHORT).show();
         }
 
@@ -403,15 +406,16 @@ public class VideoActivity extends AppCompatActivity implements
                 if(socket != null){
                     ic = new Incall(socket);
                     ic.start();
-                    mtxtRecord.setText("通話中...");
-                    mbtn_callBaby.setEnabled(false);
                 }
             }
         });
 
         thread.start();
 
-        if(socket == null){
+        if(socket != null){
+            mtxtRecord.setText("通話中...");
+            mbtn_callBaby.setEnabled(false);
+        }else if(socket == null){
             Toast.makeText(VideoActivity.this, "未連線", Toast.LENGTH_SHORT).show();
         }
     }

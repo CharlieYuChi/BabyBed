@@ -37,6 +37,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.Spinner;
@@ -113,6 +114,8 @@ public class MusicActivity extends AppCompatActivity implements
     private final Boolean INTERACTIVE = true;
     private final Boolean NORMAL = false;
     private TextView mtxtControlMusic;
+    private ImageButton mbtn_playmusic;
+    private ImageButton mbtn_stopmusic;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,6 +143,10 @@ public class MusicActivity extends AppCompatActivity implements
         mspinner_speed = (Spinner) findViewById(R.id.spinner_speed);
 
         mtxtControlMusic = (TextView) findViewById(R.id.txtControlMusic);
+        mbtn_playmusic = (ImageButton) findViewById(R.id.btn_playmusic);
+        mbtn_stopmusic = (ImageButton) findViewById(R.id.btn_stopmusic);
+
+        mbtn_stopmusic.setEnabled(false);
 
         final SwitchCompat switchCompat = (SwitchCompat) findViewById(R.id.switch_compat);
 
@@ -528,6 +535,9 @@ public class MusicActivity extends AppCompatActivity implements
         Intent intent = new Intent("MUSICCONTROL");
         intent.putExtra("control", 1);
         sendBroadcast(intent);
+
+        mbtn_playmusic.setEnabled(false);
+        mbtn_stopmusic.setEnabled(true);
         mtxtControlMusic.setText("播放中~");
     }
 
@@ -536,6 +546,9 @@ public class MusicActivity extends AppCompatActivity implements
         Intent intent = new Intent("MUSICCONTROL");
         intent.putExtra("control", 0);
         sendBroadcast(intent);
+
+        mbtn_stopmusic.setEnabled(false);
+        mbtn_playmusic.setEnabled(true);
         mtxtControlMusic.setText("準備播放");
     }
 

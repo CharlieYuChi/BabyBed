@@ -24,6 +24,16 @@
             android:padding="0dp"
             android:background="@drawable/main_backgroud"/>
 
+        <ImageButton
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_margin="6dp"
+            android:layout_alignRight="@+id/main_imageBackground"
+            android:layout_alignBottom="@+id/main_imageBackground"
+            android:src="@drawable/ic_edit"
+            android:background="@color/transparent"
+            android:onClick="buttonChangeBackground"/>
+
         <ImageView
             android:id="@+id/imageView3"
             android:layout_width="180dp"
@@ -35,6 +45,16 @@
             android:maxWidth="100dp"
             android:padding="3dp"
             android:src="@drawable/baby"/>
+
+        <ImageButton
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_margin="6dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignRight="@+id/imageView3"
+            android:src="@drawable/ic_edit"
+            android:background="@color/transparent"
+            android:onClick="buttonChangeHeadShot"/>
 
     </RelativeLayout>
 

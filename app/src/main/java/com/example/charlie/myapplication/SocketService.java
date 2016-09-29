@@ -148,28 +148,45 @@ public class SocketService extends Service {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            //00 0101  5 play
+            //00 0110  6 stop
+
             final int PLAY_MUSIC = 1;
             final int STOP_MUSIC = 0;
             int control = intent.getIntExtra("control",0);
 
-            if(control == PLAY_MUSIC){
-                Log.d("PLAYPLAY","playmusic");
-                Byte dataLength = 1;
-                Log.d("socketSend1",""+control);
-                output = new byte[]{};
-                try {
-                    writer.write(output);
-                    writer.flush();
-                    Thread.sleep(500);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+            if(socketConnectSuccess == true){
+                if(control == PLAY_MUSIC){
+                    Log.d("PLAYPLAY","playmusic");
+                    Log.d("socketSend1",""+control);
+                    output = new byte[]{0x45,0x31,0x01,0x00};
+                    try {
+                        writer.write(output);
+                        writer.flush();
+                        Thread.sleep(500);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }else if(control == STOP_MUSIC){
+                    Log.d("STOPSTOP","stopmusic");
+                    Log.d("socketSend1",""+control);
+                    output = new byte[]{0x46,0x31,0x01,0x00};
+                    try {
+                        writer.write(output);
+                        writer.flush();
+                        Thread.sleep(500);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }else if(control == STOP_MUSIC){
-                Log.d("STOPSTOP","stopmusic");
+            } else {
+                Log.d("control","no socket");
+                Toast.makeText(SocketService.this, "未連線", Toast.LENGTH_SHORT).show();
             }
-
         }
     };
 
@@ -181,24 +198,36 @@ public class SocketService extends Service {
             final int NORMAL = 0;
             int control = intent.getIntExtra("mode",0);
 
-            if(control == INTERACTIVE){
-                Log.d("PLAYPLAY","playmusic");
-                Byte dataLength = 1;
-                Log.d("socketSend1",""+control);
-                output = new byte[]{};
-                try {
-                    writer.write(output);
-                    writer.flush();
-                    Thread.sleep(500);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+            if(socketConnectSuccess == true){
+                if(control == INTERACTIVE){
+                    Log.d("PLAYPLAY","playmusic");
+                    output = new byte[]{0x50,0x32,0x01,0x01};
+                    try {
+                        writer.write(output);
+                        writer.flush();
+                        Thread.sleep(500);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }else if(control == NORMAL){
+                    Log.d("STOPSTOP","stopmusic");
+                    output = new byte[]{0x50,0x32,0x01,0x00};
+                    try {
+                        writer.write(output);
+                        writer.flush();
+                        Thread.sleep(500);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }else if(control == NORMAL){
-                Log.d("STOPSTOP","stopmusic");
+            }else {
+                Log.d("mode","no socket");
+                Toast.makeText(SocketService.this, "未連線", Toast.LENGTH_SHORT).show();
             }
-
         }
     };
 
@@ -217,9 +246,22 @@ public class SocketService extends Service {
             Toast.makeText(context, "Music: " + intent.getIntExtra("timbre",0), Toast.LENGTH_LONG).show();
 
             Byte temp;
+            Byte dataLength = 1;
+
+            temp = (byte)timbre;
+            Log.d("socketSend4",temp.toString());
+            output = new byte[]{TIMBRE, 0x31, dataLength ,temp};
+            try {
+                writer.write(output);
+                writer.flush();
+                Thread.sleep(500);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
             temp = (byte) volume;
-            Byte dataLength = 1;
             Log.d("socketSend1",temp.toString());
             output = new byte[]{VOLUME, 0x31, dataLength,temp};
             try {
@@ -260,18 +302,7 @@ public class SocketService extends Service {
             }
 
 
-            temp = (byte)timbre;
-            Log.d("socketSend4",temp.toString());
-            output = new byte[]{TIMBRE, 0x31, dataLength ,temp};
-            try {
-                writer.write(output);
-                writer.flush();
-                Thread.sleep(500);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+
 
         }
     };

@@ -6,6 +6,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Icon;
@@ -21,6 +22,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -38,6 +40,8 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
+import java.io.FileNotFoundException;
+import java.net.URISyntaxException;
 import java.sql.Time;
 import java.text.DecimalFormat;
 import java.util.Calendar;
@@ -58,6 +62,12 @@ public class MainActivity extends AppCompatActivity
     private static int birthYear;
     private static int birthMonth;
     private static int birthDay;
+    private SharedPreferences settingsField;
+    private static final String data = "DATA";
+    private static final String nameField = "NAME";
+    private static final String heightField = "HEIGHT";
+    private static final String weightField = "WEIGHT";
+    private static final String genderField = "GENDER";
 
 
     //Music用的變數
@@ -72,6 +82,9 @@ public class MainActivity extends AppCompatActivity
     //music的intent要用的
     private  static final int REQUEST_MUSIC = 1;
 
+    // 外部 App 回傳結果的類型判斷碼
+    private static final int FILE_SELECT_CODE = 0;
+
     //沒用到的
     private boolean processMenu = false;
     private static String clientId = "TurtleCarAndroid";
@@ -84,7 +97,7 @@ public class MainActivity extends AppCompatActivity
     private TextView show_weight;
     private TextView show_injectionType;
     private TextView show_injectDay;
-
+    private ImageView mimageView3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +113,10 @@ public class MainActivity extends AppCompatActivity
         show_injectDay = (TextView) findViewById(R.id.txtInjectDay);
 
         genderImg = (ImageView) findViewById(R.id.imgGender);
+
+        mimageView3 = (ImageView) findViewById(R.id.imageView3);
+
+        readData();
 
         //Toast.makeText(MainActivity.this, "onCreate" + "serverIP" + serverIP, Toast.LENGTH_LONG).show();
 
@@ -142,6 +159,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
+        readData();
         //Toast.makeText(MainActivity.this, "onResume" + "serverIP" + serverIP, Toast.LENGTH_LONG).show();
     }
 
@@ -170,6 +188,7 @@ public class MainActivity extends AppCompatActivity
                 Log.d(" activity", "mon:" + birthMonth);
                 Log.d(" activity", "day:" + birthDay);
 
+                saveBabyData();
                 //Toast.makeText(MainActivity.this, "MainResultserverIP:" + serverIP , Toast.LENGTH_LONG).show();
                 //Toast.makeText(MainActivity.this, "Main" +"month:" + birthMonth + "day:" + birthDay,Toast.LENGTH_LONG).show();
 
@@ -192,6 +211,28 @@ public class MainActivity extends AppCompatActivity
                 timbre = data.getStringExtra("timbre");
                 speed = data.getStringExtra("speed");
 
+            } else if(requestCode == FILE_SELECT_CODE){
+                // 取得檔案路徑 Uri
+                Uri uri = data.getData();
+                mimageView3.setImageURI(uri);
+                // 取得路徑
+                String path = null;
+                path = FileUtils.getPath(this, uri);
+
+                // 檢查檔案類型
+                String filename = null;
+                try {
+                    filename = FileUtils.typefaceChecker(path);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+                if( filename.isEmpty() ){
+                    Toast.makeText(this, "檔案不對勁!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Do something here...
             }
         }
 
@@ -259,7 +300,55 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    public void saveBabyData(){
+        settingsField = getSharedPreferences(data,0);
+        settingsField.edit()
+                .putString(nameField, babyName)
+                .putString(heightField, height)
+                .putString(weightField, weight)
+                .putInt(genderField, gender)
+                .apply();
 
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public void readData(){
+        settingsField = this.getSharedPreferences(data,0);
+        show_name.setText(settingsField.getString(nameField, ""));
+        show_height.setText(settingsField.getString(heightField, ""));
+        show_weight.setText(settingsField.getString(weightField, ""));
+
+        if (settingsField.getInt(genderField,0) == GENDER_BOY) {
+            genderImg.setImageDrawable(getResources().getDrawable(R.drawable.icon_boy, null));
+        } else if (gender == GENDER_GIRL) {
+            genderImg.setImageDrawable(getResources().getDrawable(R.drawable.ic_girl, null));
+        }
+    }
+
+    public void buttonChangeBackground(View view) {
+    }
+
+    public void buttonChangeHeadShot(View view) {
+        fileBrowserIntent();
+    }
+
+
+    /**
+     * 啟動外部 App 的檔案管理員
+     */
+    private void fileBrowserIntent(){
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        // 設定 MIME Type 但這裡是沒用的 加個心安而已
+        intent.setType("image/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+        try {
+            startActivityForResult( Intent.createChooser(intent, "選擇字型"), FILE_SELECT_CODE );
+        } catch (android.content.ActivityNotFoundException ex) {
+            // 若使用者沒有安裝檔案瀏覽器的 App 則顯示提示訊息
+            Toast.makeText(this, "沒有檔案瀏覽器 是沒辦法選擇字型的", Toast.LENGTH_SHORT).show();
+        }
+    }
 
     //學長的function還不知道功能
     private void processConnect(String brokerIp, String brokerPort) {
@@ -313,6 +402,8 @@ public class MainActivity extends AppCompatActivity
     public void setExitSwichLayout() {
         SwitchLayout.get3DRotateFromRight(this,false,null);
     }
+
+
 }
 
 /**
