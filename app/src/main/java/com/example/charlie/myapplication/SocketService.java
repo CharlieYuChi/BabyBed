@@ -26,7 +26,9 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.net.Socket;
+import java.util.ArrayList;
 
 /**
  * Created by charlie on 2016/4/26.
@@ -50,6 +52,10 @@ public class SocketService extends Service {
     Socket socket;
     boolean socketConnectSuccess = false;
 
+    private final int DANGER = 0;
+    private final int MODE = 1;
+    private final int PLAYLIST = 2;
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -61,6 +67,7 @@ public class SocketService extends Service {
         registerReceiver(receiverMusic, new IntentFilter("MUSICINFO"));
         registerReceiver(receiverMusicControl, new IntentFilter("MUSICCONTROL"));
         registerReceiver(receiverMusicMode, new IntentFilter("MUSICMODE"));
+        registerReceiver(receiverPlayList, new IntentFilter("PLAYLIST"));
 
         output = new byte[]{};
         Log.d("Service", "service executed");
@@ -79,10 +86,22 @@ public class SocketService extends Service {
             @Override
             public void handleMessage(Message msg) {
                 // 如果消息来自子线程
-                if (msg.what == 1) {
+                if (msg.what == DANGER) {
                     Log.d("SocketService", "startCheck");
                     checkState(msg.obj.toString());
                     Log.d("SocketService", msg.obj.toString());
+                } else if(msg.what == MODE){
+
+                } else if(msg.what == PLAYLIST){
+                    Log.d("SocketService", "playlist");
+                    Bundle data = msg.getData();
+                    //ArrayList<String> playList = data.getStringArrayList("playlist");
+
+                    Intent intent = new Intent("PLAYLISTBACK");
+                    intent.putExtra("PLAYLIST", data);
+                    sendBroadcast(intent);
+
+                    Log.d("SocketService", "playlistend");
                 }
             }
         };
@@ -301,39 +320,95 @@ public class SocketService extends Service {
                 e.printStackTrace();
             }
 
-
-
-
+            //終止符號
+            temp = (byte) speed;
+            Log.d("socketSend3",temp.toString());
+            output = new byte[]{SPEED, 0x31, dataLength, temp};
+            try {
+                writer.write(output);
+                writer.flush();
+                Thread.sleep(500);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     };
 
-    class MyBinder extends Binder {
+    public BroadcastReceiver receiverPlayList = new BroadcastReceiver() {
 
-        public void startDownload() {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    // 执行具体的下载任务
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            if(socketConnectSuccess == true){
+                Log.d("SOCKETSERVICE","playlist");
+
+                int state = intent.getIntExtra("state", 2);
+                int list = 0;
+                int songname = 1;
+
+                if(state == list){
+                    byte dataLength = 0x00;
+                    byte requestPlayList = 0x00;
+                    byte content = 0x00;
+
+                    Log.d("socketplay","startsendRequest");
+                    output = new byte[]{requestPlayList, 0x31, dataLength, content};
+
+                    try {
+                        writer.write(output);
+                        writer.flush();
+                        Thread.sleep(500);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                }else if(state == songname){
+                    byte dataLength = 0x00;
+                    byte sendSongName = 0x00;
+                    byte[] content = new byte[0];
+
+                    try {
+                        content = intent.getStringExtra("songname").getBytes("UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+
+                    Log.d("socketplay","startsendSongname"+ intent.getStringExtra("songname"));
+
+                    output = new byte[]{sendSongName, 0x31, dataLength};
+
+                    try {
+                        writer.write(output);
+                        writer.flush();
+                        Thread.sleep(500);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    try {
+                        writer.write(content);
+                        writer.flush();
+                        Thread.sleep(500);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
                 }
-            }).start();
+
+            } else {
+                Log.d("playlist","no socket");
+                Toast.makeText(SocketService.this, "未連線", Toast.LENGTH_SHORT).show();
+            }
         }
-
-        public Socket getSocket(){
-
-            return socket;
-        }
-    }
-
-    @Override
-    public boolean onUnbind(Intent intent) {
-        return super.onUnbind(intent);
-    }
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
+    };
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public void checkState(String content){
@@ -393,4 +468,31 @@ public class SocketService extends Service {
         }
     }
 
+    class MyBinder extends Binder {
+
+        public void startDownload() {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    // 执行具体的下载任务
+                }
+            }).start();
+        }
+
+        public Socket getSocket(){
+
+            return socket;
+        }
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        return super.onUnbind(intent);
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
 }

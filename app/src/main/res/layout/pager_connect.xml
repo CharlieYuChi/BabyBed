@@ -22,7 +22,7 @@
                 android:id="@+id/txtIP"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="IP:"
+                android:text="Video IP:"
                 android:textSize="@dimen/default_textSize"
                 android:textColor="@color/blueTxt"
                 android:layout_below="@+id/toolbar_setting" />
@@ -46,7 +46,7 @@
                 android:id="@+id/txtServerIP"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="ServerIP:"
+                android:text="Server IP:"
                 android:textSize="@dimen/default_textSize"
                 android:textColor="@color/blueTxt"
                 android:layout_below="@+id/toolbar_setting" />

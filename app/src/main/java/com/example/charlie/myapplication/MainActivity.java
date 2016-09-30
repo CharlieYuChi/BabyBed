@@ -55,6 +55,8 @@ public class MainActivity extends AppCompatActivity
     private static String babyName;
     private static String height;
     private static String weight;
+    private static String headshotPath;
+    private static String backgroundPath;
     private int gender;
     private static final int GENDER_BOY = 0;
     private static final int GENDER_GIRL = 1;
@@ -68,6 +70,8 @@ public class MainActivity extends AppCompatActivity
     private static final String heightField = "HEIGHT";
     private static final String weightField = "WEIGHT";
     private static final String genderField = "GENDER";
+    private static final String headshotField = "HEADSHOT";
+    private static final String bakcgroundField = "BACKGROUND";
 
 
     //Music用的變數
@@ -83,7 +87,9 @@ public class MainActivity extends AppCompatActivity
     private  static final int REQUEST_MUSIC = 1;
 
     // 外部 App 回傳結果的類型判斷碼
-    private static final int FILE_SELECT_CODE = 0;
+    private static final int FILE_SELECT_BACKGROUND = 2;
+    private static final int FILE_SELECT_HEADSHOT = 3;
+
 
     //沒用到的
     private boolean processMenu = false;
@@ -98,6 +104,7 @@ public class MainActivity extends AppCompatActivity
     private TextView show_injectionType;
     private TextView show_injectDay;
     private ImageView mimageView3;
+    private ImageView mmain_imageBackground;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,9 +122,15 @@ public class MainActivity extends AppCompatActivity
         genderImg = (ImageView) findViewById(R.id.imgGender);
 
         mimageView3 = (ImageView) findViewById(R.id.imageView3);
+        mmain_imageBackground = (ImageView) findViewById(R.id.main_imageBackground);
+
+        setImage();
+
 
         readData();
 
+        Log.d("MAIN", "name " + babyName);
+        Log.d("MAIN", "headshot " + headshotPath);
         //Toast.makeText(MainActivity.this, "onCreate" + "serverIP" + serverIP, Toast.LENGTH_LONG).show();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -166,8 +179,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
-            if (requestCode == REQUEST_SETTING) {
 
+            if (requestCode == REQUEST_SETTING) {
+                Log.d("FILE","set");
                 brokerIp = data.getStringExtra("brokerIp");
                 serverIp = data.getStringExtra("serverIP");
                 babyName = data.getStringExtra("babyName");
@@ -205,34 +219,45 @@ public class MainActivity extends AppCompatActivity
                 }
                 //Toast.makeText(MainActivity.this, "IP:" + brokerIp + " Port:" + brokerPort + "serverIP:" + serverIP , Toast.LENGTH_LONG).show();
             } else if (requestCode == REQUEST_MUSIC) {
-
+                Log.d("FILE","music");
                 volume = data.getIntExtra("volume", 0);
                 tone = data.getIntExtra("tone", 0);
                 timbre = data.getStringExtra("timbre");
                 speed = data.getStringExtra("speed");
 
-            } else if(requestCode == FILE_SELECT_CODE){
+            } else if(requestCode == FILE_SELECT_BACKGROUND){
+                Log.d("FILE","start");
                 // 取得檔案路徑 Uri
                 Uri uri = data.getData();
-                mimageView3.setImageURI(uri);
-                // 取得路徑
-                String path = null;
-                path = FileUtils.getPath(this, uri);
+                final String uripath = ImageFilePath.getPath(this, uri);
+                Log.d("FILE","uri"+uripath);
+                Bitmap temp = BitmapFactory.decodeFile(uripath);
+                mmain_imageBackground.setImageBitmap(temp);
 
-                // 檢查檔案類型
-                String filename = null;
-                try {
-                    filename = FileUtils.typefaceChecker(path);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-
-                if( filename.isEmpty() ){
+                if( uripath.isEmpty() ){
                     Toast.makeText(this, "檔案不對勁!", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                // Do something here...
+                backgroundPath = uripath;
+                saveImage();
+
+            } else if(requestCode == FILE_SELECT_HEADSHOT){
+                Log.d("FILE","start");
+                // 取得檔案路徑 Uri
+                Uri uri = data.getData();
+                final String uripath = ImageFilePath.getPath(this, uri);
+                Log.d("FILE","uri"+uripath);
+                Bitmap temp = BitmapFactory.decodeFile(uripath);
+                mimageView3.setImageBitmap(temp);
+
+                if( uripath.isEmpty() ){
+                    Toast.makeText(this, "檔案不對勁!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                headshotPath = uripath;
+                saveImage();
             }
         }
 
@@ -311,6 +336,14 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    public void saveImage(){
+        settingsField = getSharedPreferences(data,0);
+        settingsField.edit()
+                .putString(headshotField, headshotPath)
+                .putString(bakcgroundField, backgroundPath)
+                .apply();
+    }
+
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public void readData(){
         settingsField = this.getSharedPreferences(data,0);
@@ -326,27 +359,51 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void buttonChangeBackground(View view) {
+        fileBrowserIntent(FILE_SELECT_BACKGROUND);
     }
 
     public void buttonChangeHeadShot(View view) {
-        fileBrowserIntent();
+        fileBrowserIntent(FILE_SELECT_HEADSHOT);
     }
 
 
     /**
      * 啟動外部 App 的檔案管理員
      */
-    private void fileBrowserIntent(){
+    private void fileBrowserIntent(int filecode){
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         // 設定 MIME Type 但這裡是沒用的 加個心安而已
         intent.setType("image/*");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
 
         try {
-            startActivityForResult( Intent.createChooser(intent, "選擇字型"), FILE_SELECT_CODE );
+            startActivityForResult( Intent.createChooser(intent, "選擇字型"), filecode );
         } catch (android.content.ActivityNotFoundException ex) {
             // 若使用者沒有安裝檔案瀏覽器的 App 則顯示提示訊息
             Toast.makeText(this, "沒有檔案瀏覽器 是沒辦法選擇字型的", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void setImage(){
+        Log.d("mainmain", "setimage");
+        settingsField = this.getSharedPreferences(data,0);
+        String headTempPath =  settingsField.getString(headshotField, "");
+        String backTempPath =  settingsField.getString(bakcgroundField, "");
+        Log.d("mainmain", headTempPath);
+        if(headTempPath != null){
+
+            Bitmap temp = BitmapFactory.decodeFile(headTempPath);
+            //mimageView3.setImageBitmap(temp);
+        } else {
+            Log.d("mainmain", "default");
+            mimageView3.setImageResource(R.drawable.baby);
+        }
+
+        if(backTempPath != null){
+            Bitmap temp = BitmapFactory.decodeFile(backTempPath);
+            //mmain_imageBackground.setImageBitmap(temp);
+        } else {
+            mmain_imageBackground.setImageResource(R.drawable.main_backgroud);
         }
     }
 

@@ -6,6 +6,17 @@
     android:background="@color/white"
     android:orientation="vertical">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ListView
+            android:id="@+id/list"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="200dp"
@@ -52,8 +63,8 @@
             android:layout_height="wrap_content"
             android:layout_above="@+id/btn_playmusic"
             android:paddingLeft="10dp"
-            android:checked="true"
-            android:text="互動模式 "
+            android:checked="false"
+            android:text="普通模式 "
             android:textSize="20dp"
             android:textColor="@color/blueTxt"
             android:textOn=""
@@ -227,5 +238,7 @@
             android:onClick="buttonPlaylist"/>
 
     </RelativeLayout>
+
+
 
 </LinearLayout>

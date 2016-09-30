@@ -21,8 +21,9 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_margin="0dp"
+            android:scaleType="centerCrop"
             android:padding="0dp"
-            android:background="@drawable/main_backgroud"/>
+            android:src="@drawable/main_backgroud"/>
 
         <ImageButton
             android:layout_width="25dp"
@@ -40,6 +41,7 @@
             android:layout_height="135dp"
             android:layout_centerHorizontal="true"
             android:layout_alignParentBottom="true"
+            android:scaleType="centerInside"
             android:background="@color/blue2"
             android:maxHeight="100dp"
             android:maxWidth="100dp"

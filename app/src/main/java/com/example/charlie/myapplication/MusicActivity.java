@@ -3,14 +3,17 @@ package com.example.charlie.myapplication;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
@@ -32,13 +35,17 @@ import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -64,6 +71,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 
 /**
  * Created by charlie on 2016/3/6.
@@ -116,6 +124,7 @@ public class MusicActivity extends AppCompatActivity implements
     private TextView mtxtControlMusic;
     private ImageButton mbtn_playmusic;
     private ImageButton mbtn_stopmusic;
+    private ListView mListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -277,23 +286,6 @@ public class MusicActivity extends AppCompatActivity implements
 
     }
 
-    //初始化AppBar
-    public void iniBarComponent() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_music);
-        setSupportActionBar(toolbar);
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_music);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_music);
-        navigationView.setNavigationItemSelectedListener(this);
-
-    }
-
-
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -316,7 +308,8 @@ public class MusicActivity extends AppCompatActivity implements
         } else if (id == R.id.nav_setting) {
             intent.setClass(MusicActivity.this, SettingActivity.class);
             startActivityForResult(intent, REQUEST_SETTING);
-            this.finish();
+            this.onPause();
+            //this.finish();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_music);
@@ -472,22 +465,173 @@ public class MusicActivity extends AppCompatActivity implements
         Log.d("saveData", "volTemp: " + volTemp + "setfield: " + settingsField.getString(volumeField,""));
     }
 
-    @Override
-    public void setEnterSwichLayout() {
-        SwitchLayout.animDuration = 1700;
-        SwitchLayout.longAnimDuration = 1700;
-        BaseAnimViewS.animDuration = 1700;
-        BaseAnimViewS.longAnimDuration = 1700;
-        SwitchLayout.getSlideFromRight(this, false, BaseEffects.getMoreSlowEffect());
+    public void buttonPlayMusic(View view) {
+        Log.d("BUTTONPLAY","playmusic");
+        Intent intent = new Intent("MUSICCONTROL");
+        intent.putExtra("control", 1);
+        sendBroadcast(intent);
+
+        mbtn_playmusic.setEnabled(false);
+        mbtn_stopmusic.setEnabled(true);
+        mtxtControlMusic.setText("播放中~");
     }
 
-    @Override
-    public void setExitSwichLayout() {
-        SwitchLayout.animDuration = 3000;
-        SwitchLayout.longAnimDuration = 3000;
-        BaseAnimViewS.animDuration = 3000;
-        BaseAnimViewS.longAnimDuration = 3000;
-        SwitchLayout.get3DRotateFromLeft(this, true, BaseEffects.getMoreSlowEffect());
+    public void buttonStopMusic(View view) {
+        Log.d("BUTTONSTOP","stopmusic");
+        Intent intent = new Intent("MUSICCONTROL");
+        intent.putExtra("control", 0);
+        sendBroadcast(intent);
+
+        mbtn_stopmusic.setEnabled(false);
+        mbtn_playmusic.setEnabled(true);
+        mtxtControlMusic.setText("準備播放");
+    }
+
+    public void buttonPlaylist(View view) {
+
+        Log.d("BUTTONPLAYLIST","playlist");
+        Intent intent = new Intent("PLAYLIST");
+        intent.putExtra("state",0);
+        sendBroadcast(intent);
+
+        //接收server傳回的資料
+        registerReceiver(receiverPlayList, new IntentFilter("PLAYLISTBACK"));
+
+        //test
+        ArrayList<String> playList = new ArrayList<String>();
+        playList.add("1st song");
+        playList.add("2nd song");
+        playList.add("3rd song");
+        mListView = (ListView) findViewById(R.id.list);
+        mListView.setAdapter(new MyAdapter(playList));
+
+        Toast.makeText(MusicActivity.this, "歌單~~",Toast.LENGTH_SHORT).show();
+    }
+
+    private class MyAdapter extends BaseAdapter {
+        private ArrayList<String> mList;
+        private String[] testsong = {"abc","asdf" , "asdfasdf", "asdffasd", "sadfasd","abc","asdf" , "asdfasdf", "asdffasd", "sadfasd","abc","asdf" , "asdfasdf", "asdffasd", "sadfasd","","","","","","","","","","","",""};
+
+        public MyAdapter(ArrayList<String> playListBack){
+
+            Log.d("music","ma");
+            mList = new ArrayList<String>();
+            mList = playListBack;
+            Log.d("music","ma: " +mList.get(2));
+
+            /*
+            for(int i = 0; i < playListBack.size(); i++){
+                final boolean add = mList.add(playListBack.get(i));
+            }
+            */
+        }
+
+        public void removeItem(){
+            mList.clear();
+        }
+
+        @Override
+        public int getCount() {
+            return mList.size();
+        }
+
+        /*
+        第一個是我們的item到哪一個位置?
+        第二個是我們這個item所使用的view
+        第三個是我們item的parent
+         */
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View v = convertView;
+            Holder holder;
+            if(v == null){
+                v = LayoutInflater.from(getApplicationContext()).inflate(R.layout.listview_item, null);
+                holder = new Holder();
+                holder.text = (TextView) v.findViewById(R.id.item_text);
+                v.setTag(holder);
+            } else{
+                holder = (Holder) v.getTag();
+            }
+
+            holder.text.setText(mList.get(position) + "");
+            v.setBackgroundColor(Color.WHITE);
+
+            if(position == 21){
+                v.setBackgroundColor(Color.RED);
+                //mListView.setAdapter();
+            }
+
+            mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                    Toast.makeText(MusicActivity.this,"CLICK " + position,Toast.LENGTH_SHORT).show();
+
+
+                    Log.d("music","click");
+                    Intent intent = new Intent("PLAYLIST");
+                    intent.putExtra("state",1);
+                    intent.putExtra("songname",mList.get(position));
+                    sendBroadcast(intent);
+                    Log.d("music","clickend");
+
+                    //關閉歌單
+                    removeItem();
+                    notifyDataSetChanged();
+                }
+            });
+
+            return v;
+        }
+
+        class Holder{
+            TextView text;
+        }
+
+        @Override
+        public Object getItem(int arg0) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int arg0) {
+            return 0;
+        }
+
+    }
+
+    //make playlist
+    public BroadcastReceiver receiverPlayList = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d("music","receive");
+            Bundle data = intent.getBundleExtra("PLAYLIST");
+
+            ArrayList<String> playList = data.getStringArrayList("playlist");
+
+            Log.d("music", "song: " + playList.get(1));
+
+            mListView = (ListView) findViewById(R.id.list);
+            mListView.setAdapter(new MyAdapter(playList));
+
+            Log.d("music","creativeview");
+        }
+    };
+
+    //初始化AppBar
+    public void iniBarComponent() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_music);
+        setSupportActionBar(toolbar);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_music);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_music);
+        navigationView.setNavigationItemSelectedListener(this);
     }
 
     @Override
@@ -530,34 +674,26 @@ public class MusicActivity extends AppCompatActivity implements
         client.disconnect();
     }
 
-    public void buttonPlayMusic(View view) {
-        Log.d("BUTTONPLAY","playmusic");
-        Intent intent = new Intent("MUSICCONTROL");
-        intent.putExtra("control", 1);
-        sendBroadcast(intent);
-
-        mbtn_playmusic.setEnabled(false);
-        mbtn_stopmusic.setEnabled(true);
-        mtxtControlMusic.setText("播放中~");
-    }
-
-    public void buttonStopMusic(View view) {
-        Log.d("BUTTONSTOP","stopmusic");
-        Intent intent = new Intent("MUSICCONTROL");
-        intent.putExtra("control", 0);
-        sendBroadcast(intent);
-
-        mbtn_stopmusic.setEnabled(false);
-        mbtn_playmusic.setEnabled(true);
-        mtxtControlMusic.setText("準備播放");
-    }
-
-    public void buttonPlaylist(View view) {
-        Toast.makeText(MusicActivity.this, "歌單~~",Toast.LENGTH_SHORT).show();
-    }
-
     /*如果想自定义特效动画时长的话，请在此四个变量对应设置 SwitchLayout.animDuration = 1000;
     * SwitchLayout.longAnimDuration = 2000; BaseAnimViewS.animDuration = 1000;
     * BaseAnimViewS.longAnimDuration = 2000;即可。单位毫秒。*/
+
+    @Override
+    public void setEnterSwichLayout() {
+        SwitchLayout.animDuration = 1700;
+        SwitchLayout.longAnimDuration = 1700;
+        BaseAnimViewS.animDuration = 1700;
+        BaseAnimViewS.longAnimDuration = 1700;
+        SwitchLayout.getSlideFromRight(this, false, BaseEffects.getMoreSlowEffect());
+    }
+
+    @Override
+    public void setExitSwichLayout() {
+        SwitchLayout.animDuration = 3000;
+        SwitchLayout.longAnimDuration = 3000;
+        BaseAnimViewS.animDuration = 3000;
+        BaseAnimViewS.longAnimDuration = 3000;
+        SwitchLayout.get3DRotateFromLeft(this, true, BaseEffects.getMoreSlowEffect());
+    }
 
 }
