@@ -18,9 +18,13 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -426,6 +430,9 @@ public class SocketService extends Service {
                 {1000, 500, 1000, 400, 1000, 300, 1000, 200, 1000, 100};
         final Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION); // 通知音效的URI，在這裡使用系統內建的通知音效
 
+        final View alert_dialog = LayoutInflater.from(SocketService.this).inflate(R.layout.alert_dialog, null);
+        TextView alert = (TextView) alert_dialog.findViewById(R.id.alert_content);
+
         //加入判斷寶寶狀態
         Log.d("SocketService", content);
         Notification notification;
@@ -436,9 +443,16 @@ public class SocketService extends Service {
                         .setContentTitle("危險")
                         .setContentText("寶寶吐的一蹋糊塗!")
                         .setVibrate(vibrate_effect)
-                        .setSound(soundUri)
+                        .setSound(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.alert))
+                        .setLights(0x00FF00, 1000,1000)
                         .build(); // 建立通知
                 notificationManager.notify(notifyID, notification); // 發送通知
+
+                alert.setText("寶寶吐的一蹋糊塗!");
+                new AlertDialog.Builder(SocketService.this)
+                        .setView(alert_dialog)
+                        .show();
+
                 break;
 
             case NOFACE:
@@ -447,9 +461,16 @@ public class SocketService extends Service {
                         .setContentTitle("危險")
                         .setContentText("寶寶照不到臉!")
                         .setVibrate(vibrate_effect)
-                        .setSound(soundUri)
+                        .setSound(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.alert))
+                        .setLights(0x00FF00, 1000,1000)
                         .build(); // 建立通知
                 notificationManager.notify(notifyID, notification); // 發送通知
+
+                alert.setText("寶寶照不到臉!");
+                new AlertDialog.Builder(SocketService.this)
+                        .setView(alert_dialog)
+                        .show();
+
                 break;
 
             case STAND:
@@ -458,9 +479,16 @@ public class SocketService extends Service {
                         .setContentTitle("危險")
                         .setContentText("寶寶站起來啦!")
                         .setVibrate(vibrate_effect)
-                        .setSound(soundUri)
+                        .setSound(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.alert))
+                        .setLights(0x00FF00, 1000,1000)
                         .build(); // 建立通知
                 notificationManager.notify(notifyID, notification); // 發送通知
+
+                alert.setText("寶寶站起來啦!");
+                new AlertDialog.Builder(SocketService.this)
+                        .setView(alert_dialog)
+                        .show();
+
                 break;
 
             default:

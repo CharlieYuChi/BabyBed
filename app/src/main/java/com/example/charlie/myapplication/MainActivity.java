@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -14,6 +15,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -21,6 +23,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -106,6 +109,7 @@ public class MainActivity extends AppCompatActivity
     private ImageView mimageView3;
     private ImageView mmain_imageBackground;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -118,6 +122,8 @@ public class MainActivity extends AppCompatActivity
         show_weight = (TextView) findViewById(R.id.txtEdtWeight);
         show_injectionType = (TextView) findViewById(R.id.txtInjectType);
         show_injectDay = (TextView) findViewById(R.id.txtInjectDay);
+
+
 
         genderImg = (ImageView) findViewById(R.id.imgGender);
 
@@ -288,20 +294,29 @@ public class MainActivity extends AppCompatActivity
             Bitmap largeIcon = BitmapFactory.decodeResource(
                     getResources(), R.drawable.ic_babydead);
             long[] vibrate_effect =
-                    {1000, 500, 1000, 400, 1000, 300, 1000, 200, 1000, 100};
+                    {1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000};
             final Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION); // 通知音效的URI，在這裡使用系統內建的通知音效
 
             final int notifyID = 1; // 通知的識別號碼
             final NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE); // 取得系統的通知服務
             final Notification notification = new Notification.Builder(getApplicationContext())
                     .setSmallIcon(R.drawable.ic_babydead)
+                    .setLargeIcon(BitmapFactory.decodeResource(this.getResources(), R.drawable.ic_babydead))
                     .setContentTitle("危險")
                     .setContentText("寶寶吐的一蹋糊塗!")
                     .setVibrate(vibrate_effect)
-                    .setSound(soundUri)
+                    .setSound(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.alert))
+                    .setLights(0x00FF00, 1000,1000)
                     .build(); // 建立通知
             notificationManager.notify(notifyID, notification); // 發送通知
             //https://magiclen.org/android-notifications/
+
+            final View temp = LayoutInflater.from(MainActivity.this).inflate(R.layout.alert_dialog, null);
+            TextView alert = (TextView) temp.findViewById(R.id.alert_content);
+            alert.setText("已枯~~");
+            new AlertDialog.Builder(MainActivity.this)
+                    .setView(temp)
+                    .show();
 
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_main);
             drawer.closeDrawer(GravityCompat.START);

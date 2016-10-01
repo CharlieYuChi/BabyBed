@@ -52,7 +52,6 @@ public class ClientThread implements Runnable {
             while(true){
                 // 每当读到来自服务器的数据之后，发送消息通知程序界面显示该数据
 
-
                 temp = br.read(header);
 
                 Log.d("CTTEMP", ""+temp);

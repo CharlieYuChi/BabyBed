@@ -498,13 +498,14 @@ public class MusicActivity extends AppCompatActivity implements
         registerReceiver(receiverPlayList, new IntentFilter("PLAYLISTBACK"));
 
         //test
+        /*
         ArrayList<String> playList = new ArrayList<String>();
         playList.add("1st song");
         playList.add("2nd song");
         playList.add("3rd song");
         mListView = (ListView) findViewById(R.id.list);
         mListView.setAdapter(new MyAdapter(playList));
-
+        */
         Toast.makeText(MusicActivity.this, "歌單~~",Toast.LENGTH_SHORT).show();
     }
 
