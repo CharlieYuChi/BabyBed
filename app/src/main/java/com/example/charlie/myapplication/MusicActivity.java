@@ -491,6 +491,15 @@ public class MusicActivity extends AppCompatActivity implements
 
     public void buttonPlaylist(View view) {
 
+
+        ArrayList<String> playList = new ArrayList<String>();
+        playList.add("sdfasdf");
+        playList.add("sdff");
+        playList.add("sdfdf");
+
+        mListView = (ListView) findViewById(R.id.list);
+        mListView.setAdapter(new MyAdapter(playList));
+
         Log.d("BUTTONPLAYLIST","playlist");
         Intent intent = new Intent("PLAYLIST");
         intent.putExtra("state",0);
@@ -498,6 +507,8 @@ public class MusicActivity extends AppCompatActivity implements
 
         //接收server傳回的資料
         registerReceiver(receiverPlayList, new IntentFilter("PLAYLISTBACK"));
+
+
 
         //test
         /*
