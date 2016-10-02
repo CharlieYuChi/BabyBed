@@ -321,32 +321,34 @@ public class MusicActivity extends AppCompatActivity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
-            Uri uri = data.getData();
-            final String uripath = ImageFilePath.getPath(this, uri);
+            if(requestCode == FILE_SELECT_CODE){
+                Uri uri = data.getData();
+                final String uripath = ImageFilePath.getPath(this, uri);
 
-            Log.d("uriPath", uripath);
+                Log.d("uriPath", uripath);
 
-            Log.d("buttonSend","Startsend");
-            final SendFile sendFile = new SendFile();
-            Thread th = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        sendFile.sendFile(uripath,serverIp);
-                    } catch (InterruptedIOException e1){
-                        Log.d("Thread","end");
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                Log.d("buttonSend","Startsend");
+                final SendFile sendFile = new SendFile();
+                Thread th = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            sendFile.sendFile(uripath,serverIp);
+                        } catch (InterruptedIOException e1){
+                            Log.d("Thread","end");
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
                     }
+                });
 
-                }
-            });
+                th.start();
 
-            th.start();
+                Log.d("buttonSend","Endsend");
+                Toast.makeText(this,"傳送完成^^",Toast.LENGTH_SHORT).show();
 
-            Log.d("buttonSend","Endsend");
-            Toast.makeText(this,"傳送完成^^",Toast.LENGTH_SHORT).show();
-
+            }
         }
 
 
@@ -401,7 +403,7 @@ public class MusicActivity extends AppCompatActivity implements
     }
 
     // 外部 App 回傳結果的類型判斷碼
-    private static final int FILE_SELECT_CODE = 0;
+    private static final int FILE_SELECT_CODE = 2;
     /**
      * 啟動外部 App 的檔案管理員
      */
