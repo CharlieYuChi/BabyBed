@@ -491,15 +491,6 @@ public class MusicActivity extends AppCompatActivity implements
 
     public void buttonPlaylist(View view) {
 
-
-        ArrayList<String> playList = new ArrayList<String>();
-        playList.add("sdfasdf");
-        playList.add("sdff");
-        playList.add("sdfdf");
-
-        mListView = (ListView) findViewById(R.id.list);
-        mListView.setAdapter(new MyAdapter(playList));
-
         Log.d("BUTTONPLAYLIST","playlist");
         Intent intent = new Intent("PLAYLIST");
         intent.putExtra("state",0);
@@ -507,8 +498,6 @@ public class MusicActivity extends AppCompatActivity implements
 
         //接收server傳回的資料
         registerReceiver(receiverPlayList, new IntentFilter("PLAYLISTBACK"));
-
-
 
         //test
         /*
@@ -531,7 +520,7 @@ public class MusicActivity extends AppCompatActivity implements
             Log.d("music","ma");
             mList = new ArrayList<String>();
             mList = playListBack;
-            Log.d("music","ma: " +mList.get(2));
+            //Log.d("music","ma: " +mList.get(2));
 
             /*
             for(int i = 0; i < playListBack.size(); i++){
@@ -570,17 +559,18 @@ public class MusicActivity extends AppCompatActivity implements
             holder.text.setText(mList.get(position) + "");
             v.setBackgroundColor(Color.WHITE);
 
+            /*
             if(position == 21){
                 v.setBackgroundColor(Color.RED);
                 //mListView.setAdapter();
             }
+            */
 
             mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                     Toast.makeText(MusicActivity.this,"CLICK " + position,Toast.LENGTH_SHORT).show();
-
 
                     Log.d("music","click");
                     Intent intent = new Intent("PLAYLIST");
@@ -624,7 +614,7 @@ public class MusicActivity extends AppCompatActivity implements
 
             ArrayList<String> playList = data.getStringArrayList("playlist");
 
-            Log.d("music", "song: " + playList.get(1));
+            //Log.d("music", "song: " + playList.get(1));
 
             mListView = (ListView) findViewById(R.id.list);
             mListView.setAdapter(new MyAdapter(playList));

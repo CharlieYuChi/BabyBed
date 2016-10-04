@@ -23,12 +23,13 @@ public class ClientThread implements Runnable {
     private DataInputStream br = null;
     private final byte DANGER = 0x0C;
     private final byte MODE = 0x00;
-    private final byte PLAYLIST = 0x01;
+    private final byte PLAYLIST = 0x20;
+    private final byte TERMINATE = 0x1F;
     private final int wDANGER = 0;
     private final int wMODE = 1;
     private final int wPLAYLIST = 2;
-    private final String TERMINATE = "\0";
     private static ArrayList playlist;
+    private boolean newList = true;
 
     public ClientThread(Socket socket, Handler handler) throws IOException {
         this.handler = handler;
@@ -89,6 +90,11 @@ public class ClientThread implements Runnable {
                         Log.d("client", "handlersend");
                     } else if(type == PLAYLIST){
 
+                        if(newList == false){
+                            playlist = new ArrayList();
+                            newList = true;
+                        }
+
                         Log.d("CT","playlist");
 
                         int length = (int)getLength(header);
@@ -96,23 +102,20 @@ public class ClientThread implements Runnable {
                         byte[] content = new byte[length];
 
                         temp = br.read(content);
-                        String songName = content.toString();
+                        String songName = new String(content);
                         Log.d("CLIENTTHREAD","songname: " + songName);
 
+                        playlist.add(songName);
 
-                        //songname != 終止符號
-                        if(songName.contentEquals(TERMINATE) == false){
-                            playlist.add(songName);
-                        }else {
-                            Log.d("CT","sendplaylist");
-                            Message msg = new Message();
-                            msg.what = wPLAYLIST;
-                            Bundle data = new Bundle();
-                            data.putStringArrayList("playlist", playlist);
-                            msg.setData(data);
-                            handler.sendMessage(msg);
-                        }
-
+                    } else if(type == TERMINATE){
+                        Log.d("CT","endplaylist");
+                        Message msg = new Message();
+                        msg.what = wPLAYLIST;
+                        Bundle data = new Bundle();
+                        data.putStringArrayList("playlist", playlist);
+                        msg.setData(data);
+                        handler.sendMessage(msg);
+                        newList = false;
                     }
 
                 }

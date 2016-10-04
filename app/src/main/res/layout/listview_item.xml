@@ -6,11 +6,14 @@
     <TextView
         android:id="@+id/item_text"
         android:layout_centerVertical="true"
+        android:gravity="center"
         android:background="@drawable/backgroud3"
+        android:singleLine="true"
+        android:ellipsize="middle"
         android:text="ttt"
-        android:textSize="25dp"
+        android:textSize="40dp"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="70dp"
         android:textColor="@color/white"/>
 
 

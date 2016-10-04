@@ -48,6 +48,7 @@ public class SocketService extends Service {
     private byte SPEED = 0x44;
     private byte TIMBRE = 0x43;
     private byte TONE = 0x42;
+    private final byte TERMINATE = 0x1F;
     Bundle bundle;
     int volume;
     int tone;
@@ -325,9 +326,8 @@ public class SocketService extends Service {
             }
 
             //終止符號
-            temp = (byte) speed;
             Log.d("socketSend3",temp.toString());
-            output = new byte[]{SPEED, 0x31, dataLength, temp};
+            output = new byte[]{TERMINATE, 0x31,0};
             try {
                 writer.write(output);
                 writer.flush();
@@ -354,11 +354,10 @@ public class SocketService extends Service {
 
                 if(state == list){
                     byte dataLength = 0x00;
-                    byte requestPlayList = 0x00;
-                    byte content = 0x00;
+                    byte requestPlayList = 0x61;
 
                     Log.d("socketplay","startsendRequest");
-                    output = new byte[]{requestPlayList, 0x31, dataLength, content};
+                    output = new byte[]{requestPlayList, 0x30, dataLength};
 
                     try {
                         writer.write(output);
@@ -371,39 +370,27 @@ public class SocketService extends Service {
                     }
 
                 }else if(state == songname){
-                    byte dataLength = 0x00;
-                    byte sendSongName = 0x00;
-                    byte[] content = new byte[0];
+                    byte dataLength;
+                    byte sendSongName = 0x70;
+                    byte[] content;
 
                     try {
-                        content = intent.getStringExtra("songname").getBytes("UTF-8");
-                    } catch (UnsupportedEncodingException e) {
+                        content = intent.getStringExtra("songname").getBytes();
+                        dataLength = (byte)content.length;
+                        output = new byte[]{sendSongName, 0x31, dataLength};
+
+                        writer.write(output);
+                        writer.flush();
+                        Thread.sleep(500);
+
+                        writer.write(content);
+                        writer.flush();
+                        Thread.sleep(500);
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
 
                     Log.d("socketplay","startsendSongname"+ intent.getStringExtra("songname"));
-
-                    output = new byte[]{sendSongName, 0x31, dataLength};
-
-                    try {
-                        writer.write(output);
-                        writer.flush();
-                        Thread.sleep(500);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
-                    try {
-                        writer.write(content);
-                        writer.flush();
-                        Thread.sleep(500);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
 
                 }
 
