@@ -16,6 +16,7 @@
         <item name="android:actionMenuTextAppearance">@style/MenuTextStyle</item>
 
     </style>
+
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -40,6 +41,14 @@
 
         <!-- inactive track color (30% transparency) -->
         <item name="android:colorForeground">@color/grey</item>
+    </style>
+
+    <style name = "AppTheme.Dialg"  parent = "Theme.AppCompat.Light.Dialog" >
+
+    </style >
+
+    <style name="dialog" parent="Theme.AppCompat.Dialog">
+        <item name="android:windowNoTitle">true</item>
     </style>
 
 </resources>

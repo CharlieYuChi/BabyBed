@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Binder;
@@ -17,11 +18,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.view.ContextThemeWrapper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -48,7 +52,7 @@ public class SocketService extends Service {
     private byte SPEED = 0x44;
     private byte TIMBRE = 0x43;
     private byte TONE = 0x42;
-    private final byte TERMINATE = 0x1F;
+    private final byte TERMINATE = 0x5F;
     Bundle bundle;
     int volume;
     int tone;
@@ -83,6 +87,30 @@ public class SocketService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        final View alert_dialog = LayoutInflater.from(SocketService.this).inflate(R.layout.alert_dialog, null);
+        TextView alert = (TextView) alert_dialog.findViewById(R.id.alert_content);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(getApplication(), R.style.dialog));
+        final AlertDialog alertDialog;
+        builder.setView(alert_dialog);
+
+        alertDialog = builder.create();
+        alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);//設定提示框為系統提示框
+        final Handler hanlder = new Handler();
+        new Thread(){
+            public void run() {
+                SystemClock.sleep(4000);
+
+                hanlder.post(new Runnable() {
+                    @Override public void run() {
+                        alertDialog.show();
+                    }
+                });
+            };
+        }.start();
+
+        //alertDialog.show();
+
         serverIP = intent.getStringExtra("serverIP");
 
         Log.d("socketsocket",serverIP);
@@ -420,6 +448,9 @@ public class SocketService extends Service {
         final View alert_dialog = LayoutInflater.from(SocketService.this).inflate(R.layout.alert_dialog, null);
         TextView alert = (TextView) alert_dialog.findViewById(R.id.alert_content);
 
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog alertDialog;
+
         //加入判斷寶寶狀態
         Log.d("SocketService", content);
         Notification notification;
@@ -436,9 +467,7 @@ public class SocketService extends Service {
                 notificationManager.notify(notifyID, notification); // 發送通知
 
                 alert.setText("寶寶吐的一蹋糊塗!");
-                new AlertDialog.Builder(SocketService.this)
-                        .setView(alert_dialog)
-                        .show();
+                builder.setView(alert_dialog);
 
                 break;
 
@@ -454,9 +483,7 @@ public class SocketService extends Service {
                 notificationManager.notify(notifyID, notification); // 發送通知
 
                 alert.setText("寶寶照不到臉!");
-                new AlertDialog.Builder(SocketService.this)
-                        .setView(alert_dialog)
-                        .show();
+                builder.setView(alert_dialog);
 
                 break;
 
@@ -472,15 +499,17 @@ public class SocketService extends Service {
                 notificationManager.notify(notifyID, notification); // 發送通知
 
                 alert.setText("寶寶站起來啦!");
-                new AlertDialog.Builder(SocketService.this)
-                        .setView(alert_dialog)
-                        .show();
+                builder.setView(alert_dialog);
 
                 break;
 
             default:
                 break;
         }
+
+        alertDialog = builder.create();
+        alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);//設定提示框為系統提示框
+        alertDialog.show();
     }
 
     class MyBinder extends Binder {
