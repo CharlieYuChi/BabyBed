@@ -17,7 +17,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.IInterface;
 import android.os.Message;
+import android.os.Parcel;
+import android.os.RemoteException;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -25,12 +28,14 @@ import android.support.v7.view.ContextThemeWrapper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -64,10 +69,19 @@ public class SocketService extends Service {
     private final int DANGER = 0;
     private final int MODE = 1;
     private final int PLAYLIST = 2;
+    private final int SONGEND = 3;
+
+    boolean alertFlag = false;
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 
     @Override
@@ -77,6 +91,7 @@ public class SocketService extends Service {
         registerReceiver(receiverMusicControl, new IntentFilter("MUSICCONTROL"));
         registerReceiver(receiverMusicMode, new IntentFilter("MUSICMODE"));
         registerReceiver(receiverPlayList, new IntentFilter("PLAYLIST"));
+        registerReceiver(receiverAlert, new IntentFilter("ALERT"));
 
         output = new byte[]{};
         Log.d("Service", "service executed");
@@ -87,29 +102,6 @@ public class SocketService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        final View alert_dialog = LayoutInflater.from(SocketService.this).inflate(R.layout.alert_dialog, null);
-        TextView alert = (TextView) alert_dialog.findViewById(R.id.alert_content);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(getApplication(), R.style.dialog));
-        final AlertDialog alertDialog;
-        builder.setView(alert_dialog);
-
-        alertDialog = builder.create();
-        alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);//設定提示框為系統提示框
-        final Handler hanlder = new Handler();
-        new Thread(){
-            public void run() {
-                SystemClock.sleep(4000);
-
-                hanlder.post(new Runnable() {
-                    @Override public void run() {
-                        alertDialog.show();
-                    }
-                });
-            };
-        }.start();
-
-        //alertDialog.show();
 
         serverIP = intent.getStringExtra("serverIP");
 
@@ -135,6 +127,10 @@ public class SocketService extends Service {
                     sendBroadcast(intent);
 
                     Log.d("SocketService", "playlistend");
+                } else if(msg.what == SONGEND){
+                    Log.d("SocketService", "songend");
+                    Intent intent = new Intent("PLAYBUTTON");
+                    sendBroadcast(intent);
                 }
             }
         };
@@ -192,6 +188,7 @@ public class SocketService extends Service {
         if (socketConnectSuccess == false){
             Toast.makeText(SocketService.this, "未連接到伺服器",Toast.LENGTH_SHORT).show();
         }
+
 
         return super.onStartCommand(intent, flags, startId);
     }
@@ -405,7 +402,7 @@ public class SocketService extends Service {
                     try {
                         content = intent.getStringExtra("songname").getBytes();
                         dataLength = (byte)content.length;
-                        output = new byte[]{sendSongName, 0x31, dataLength};
+                        output = new byte[]{sendSongName, 0x31, (byte) (dataLength + 1)};
 
                         writer.write(output);
                         writer.flush();
@@ -414,6 +411,14 @@ public class SocketService extends Service {
                         writer.write(content);
                         writer.flush();
                         Thread.sleep(500);
+
+                        output = new byte[]{TERMINATE, 0x31,0};
+                        writer.write(output);
+                        writer.flush();
+                        Thread.sleep(500);
+
+
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -445,33 +450,35 @@ public class SocketService extends Service {
                 {1000, 500, 1000, 400, 1000, 300, 1000, 200, 1000, 100};
         final Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION); // 通知音效的URI，在這裡使用系統內建的通知音效
 
-        final View alert_dialog = LayoutInflater.from(SocketService.this).inflate(R.layout.alert_dialog, null);
-        TextView alert = (TextView) alert_dialog.findViewById(R.id.alert_content);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        AlertDialog alertDialog;
+        Intent it = new Intent(this, AlertDialogActivity.class);
 
         //加入判斷寶寶狀態
         Log.d("SocketService", content);
         Notification notification;
         switch (content){
             case THROWUP:
+                if(alertFlag == false){
                 notification = new Notification.Builder(getApplicationContext())
                         .setSmallIcon(R.drawable.ic_babydead)
                         .setContentTitle("危險")
-                        .setContentText("寶寶吐的一蹋糊塗!")
+                        .setContentText("寶寶吐惹!")
                         .setVibrate(vibrate_effect)
                         .setSound(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.alert))
                         .setLights(0x00FF00, 1000,1000)
                         .build(); // 建立通知
                 notificationManager.notify(notifyID, notification); // 發送通知
 
-                alert.setText("寶寶吐的一蹋糊塗!");
-                builder.setView(alert_dialog);
+
+                    it.putExtra("text","寶寶吐惹!");
+                    it.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(it);
+                    alertFlag = true;
+                }
 
                 break;
 
             case NOFACE:
+                if(alertFlag == false){
                 notification = new Notification.Builder(getApplicationContext())
                         .setSmallIcon(R.drawable.ic_babydead)
                         .setContentTitle("危險")
@@ -482,12 +489,17 @@ public class SocketService extends Service {
                         .build(); // 建立通知
                 notificationManager.notify(notifyID, notification); // 發送通知
 
-                alert.setText("寶寶照不到臉!");
-                builder.setView(alert_dialog);
+
+                    it.putExtra("text","寶寶照不到臉!");
+                    it.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(it);
+                    alertFlag = true;
+                }
 
                 break;
 
             case STAND:
+                if(alertFlag == false){
                 notification = new Notification.Builder(getApplicationContext())
                         .setSmallIcon(R.drawable.ic_babydead)
                         .setContentTitle("危險")
@@ -498,45 +510,29 @@ public class SocketService extends Service {
                         .build(); // 建立通知
                 notificationManager.notify(notifyID, notification); // 發送通知
 
-                alert.setText("寶寶站起來啦!");
-                builder.setView(alert_dialog);
+
+                    it.putExtra("text","寶寶站起來啦!");
+                    it.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(it);
+                    alertFlag = true;
+                }
 
                 break;
 
             default:
                 break;
         }
-
-        alertDialog = builder.create();
-        alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);//設定提示框為系統提示框
-        alertDialog.show();
     }
 
-    class MyBinder extends Binder {
+    public BroadcastReceiver receiverAlert = new BroadcastReceiver() {
 
-        public void startDownload() {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    // 执行具体的下载任务
-                }
-            }).start();
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            setAlertFlag(intent.getBooleanExtra("alert", false));
         }
+    };
 
-        public Socket getSocket(){
-
-            return socket;
-        }
-    }
-
-    @Override
-    public boolean onUnbind(Intent intent) {
-        return super.onUnbind(intent);
-    }
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
+    public void setAlertFlag(boolean alertFlag){
+        this.alertFlag = alertFlag;
     }
 }

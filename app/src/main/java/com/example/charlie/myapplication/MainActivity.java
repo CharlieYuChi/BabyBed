@@ -290,6 +290,7 @@ public class MainActivity extends AppCompatActivity
         Intent intent = new Intent();
 
         if (id == R.id.nav_main){
+            /*
             // 建立大圖示需要的Bitmap物件
             Bitmap largeIcon = BitmapFactory.decodeResource(
                     getResources(), R.drawable.ic_babydead);
@@ -317,7 +318,7 @@ public class MainActivity extends AppCompatActivity
             new AlertDialog.Builder(MainActivity.this)
                     .setView(temp)
                     .show();
-
+            */
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_main);
             drawer.closeDrawer(GravityCompat.START);
         } else if (id == R.id.nav_music) {

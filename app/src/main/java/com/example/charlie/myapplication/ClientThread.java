@@ -25,9 +25,11 @@ public class ClientThread implements Runnable {
     private final byte MODE = 0x00;
     private final byte PLAYLIST = 0x20;
     private final byte TERMINATE = 0x1F;
+    private final byte SONGEND = 0x3F;
     private final int wDANGER = 0;
     private final int wMODE = 1;
     private final int wPLAYLIST = 2;
+    private final int wSONGEND = 3;
     private static ArrayList playlist;
     private boolean newList = true;
 
@@ -116,6 +118,11 @@ public class ClientThread implements Runnable {
                         msg.setData(data);
                         handler.sendMessage(msg);
                         newList = false;
+                    } else if(type == SONGEND){
+                        Log.d("CT","SONGEND");
+                        Message msg = new Message();
+                        msg.what = wSONGEND;
+                        handler.sendMessage(msg);
                     }
 
                 }

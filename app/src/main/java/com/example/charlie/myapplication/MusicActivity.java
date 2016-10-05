@@ -85,7 +85,7 @@ public class MusicActivity extends AppCompatActivity implements
     private String brokerPort;
 
     //Music用的變數
-    private static int volume = 0;
+    private static int volume = 50;
     private static int tone = 0 ;  //1個8 2個8
     private static String timbre = "";
     private static String speed = "";
@@ -275,6 +275,9 @@ public class MusicActivity extends AppCompatActivity implements
             }
         });
 
+
+        //接收server傳回的資料
+        registerReceiver(receiverPlayButton, new IntentFilter("PLAYBUTTON"));
 
         //readData();
 
@@ -605,6 +608,7 @@ public class MusicActivity extends AppCompatActivity implements
     }
 
     //make playlist
+
     public BroadcastReceiver receiverPlayList = new BroadcastReceiver() {
 
         @Override
@@ -618,6 +622,20 @@ public class MusicActivity extends AppCompatActivity implements
 
             mListView = (ListView) findViewById(R.id.list);
             mListView.setAdapter(new MyAdapter(playList));
+
+            Log.d("music","creativeview");
+        }
+    };
+
+    public BroadcastReceiver receiverPlayButton = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d("music","receiveplay");
+
+            mbtn_stopmusic.setEnabled(false);
+            mbtn_playmusic.setEnabled(true);
+            mtxtControlMusic.setText("準備播放");
 
             Log.d("music","creativeview");
         }
