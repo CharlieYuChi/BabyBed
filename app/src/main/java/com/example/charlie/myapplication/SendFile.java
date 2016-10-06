@@ -60,9 +60,7 @@ public class SendFile {
         doc.write(header);
         doc.write(file.getName().getBytes());
         byte [] temp = file.getName().getBytes();
-        for(int i = 0 ; i < temp.length ; i ++){
-            Log.d("String",i + " : " + temp[i]);
-        }
+
         //writer.write(header);
         System.out.println("傳送文件中:" + (String) file.getName()); // public Socket accept() throws
         while (num != -1) { //是否讀完文件

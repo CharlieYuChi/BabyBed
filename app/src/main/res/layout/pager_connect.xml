@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
 
@@ -62,6 +63,21 @@
 
     </LinearLayout>
 
+
+    <android.support.v7.widget.SwitchCompat
+        android:id="@+id/dangerDetect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/btn_playmusic"
+        android:paddingLeft="30dp"
+        android:checked="false"
+        android:text="危險偵測 : 關 "
+        android:textSize="20dp"
+        android:textColor="@color/blueTxt"
+        android:textOn=""
+        android:textOff=""
+        app:showText="true"
+        android:theme="@style/MySwitch"/>
 
     <RelativeLayout
         android:layout_width="match_parent"

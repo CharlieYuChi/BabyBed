@@ -69,13 +69,18 @@ public class SocketService extends Service {
     private final int DANGER = 0;
     private final int MODE = 1;
     private final int PLAYLIST = 2;
-    private final int SONGEND = 3;
+    private final int MUSICSTATUS = 3;
 
     boolean alertFlag = false;
+
+    String dangerDetect;
+
+
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.d("socket","destroy");
     }
 
     @Nullable
@@ -92,11 +97,11 @@ public class SocketService extends Service {
         registerReceiver(receiverMusicMode, new IntentFilter("MUSICMODE"));
         registerReceiver(receiverPlayList, new IntentFilter("PLAYLIST"));
         registerReceiver(receiverAlert, new IntentFilter("ALERT"));
+        registerReceiver(receiverDangerDetect, new IntentFilter("DANGERDETECT"));
 
         output = new byte[]{};
-        Log.d("Service", "service executed");
+
         output = new byte[]{0x00,0x30};
-        Log.d("service1:", output.toString());
 
     }
 
@@ -104,6 +109,7 @@ public class SocketService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         serverIP = intent.getStringExtra("serverIP");
+        dangerDetect = intent.getStringExtra("dangerDetect");
 
         Log.d("socketsocket",serverIP);
 
@@ -112,13 +118,19 @@ public class SocketService extends Service {
             public void handleMessage(Message msg) {
                 // 如果消息来自子线程
                 if (msg.what == DANGER) {
-                    Log.d("SocketService", "startCheck");
                     checkState(msg.obj.toString());
-                    Log.d("SocketService", msg.obj.toString());
-                } else if(msg.what == MODE){
 
+                } else if(msg.what == MODE){
+                    Log.d("SocketService", "mode");
+
+                    //ArrayList<String> playList = data.getStringArrayList("playlist");
+
+                    Intent intent = new Intent("MODE");
+                    intent.putExtra("mode",msg.obj.toString());
+                    sendBroadcast(intent);
+                    Log.d("SocketService", "modeend3");
                 } else if(msg.what == PLAYLIST){
-                    Log.d("SocketService", "playlist");
+
                     Bundle data = msg.getData();
                     //ArrayList<String> playList = data.getStringArrayList("playlist");
 
@@ -126,10 +138,9 @@ public class SocketService extends Service {
                     intent.putExtra("PLAYLIST", data);
                     sendBroadcast(intent);
 
-                    Log.d("SocketService", "playlistend");
-                } else if(msg.what == SONGEND){
-                    Log.d("SocketService", "songend");
-                    Intent intent = new Intent("PLAYBUTTON");
+                } else if(msg.what == MUSICSTATUS){
+                    Intent intent = new Intent("MUSICSTATUS");
+                    intent.putExtra("musicStatus", msg.obj.toString());
                     sendBroadcast(intent);
                 }
             }
@@ -146,13 +157,12 @@ public class SocketService extends Service {
                     socket = new Socket(serverIP,8080);
 
                     output = new byte[]{0x00,0x30};
-                    Log.d("service2:", output.toString());
 
                     writer = new PrintStream(socket.getOutputStream());
                     writer.write(output);
 
-                    Log.d("serviceOut:", output.toString());
                     writer.flush();
+                    Thread.sleep(500);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -161,9 +171,36 @@ public class SocketService extends Service {
                 try {
                     if(socket != null){
                         socketConnectSuccess = true;
-                        Log.d("socketservice", "startend");
+
                         new Thread(new ClientThread(socket, handler)).start();
-                        Log.d("socketservice", "startendend");
+
+                        byte dangerType = 0x4D;
+                        byte[] content;
+
+                        try {
+                            //content = dangerDetect.getBytes();
+                            output = new byte[]{dangerType, 0x31, 1};
+
+                            writer.write(output);
+                            writer.flush();
+                            Thread.sleep(500);
+
+                            if(dangerDetect.contentEquals("0")){
+                                content = new byte[]{0};
+                                writer.write(content);
+                                writer.flush();
+                                Thread.sleep(500);
+                            }else if(dangerDetect.contentEquals("1")){
+                                content = new byte[]{1};
+                                writer.write(content);
+                                writer.flush();
+                                Thread.sleep(500);
+                            }
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
                     }else {
                         Log.d("socketservice", "SOCKetnoconnect");
                     }
@@ -206,8 +243,7 @@ public class SocketService extends Service {
 
             if(socketConnectSuccess == true){
                 if(control == PLAY_MUSIC){
-                    Log.d("PLAYPLAY","playmusic");
-                    Log.d("socketSend1",""+control);
+
                     output = new byte[]{0x45,0x31,0x01,0x00};
                     try {
                         writer.write(output);
@@ -219,8 +255,7 @@ public class SocketService extends Service {
                         e.printStackTrace();
                     }
                 }else if(control == STOP_MUSIC){
-                    Log.d("STOPSTOP","stopmusic");
-                    Log.d("socketSend1",""+control);
+
                     output = new byte[]{0x46,0x31,0x01,0x00};
                     try {
                         writer.write(output);
@@ -292,7 +327,7 @@ public class SocketService extends Service {
             tone = intent.getIntExtra("tone", 0);
             timbre = intent.getIntExtra("timbre",0);
             speed = intent.getIntExtra("speed",0);
-            Toast.makeText(context, "Music: " + intent.getIntExtra("timbre",0), Toast.LENGTH_LONG).show();
+            //Toast.makeText(context, "Music: " + intent.getIntExtra("timbre",0), Toast.LENGTH_LONG).show();
 
             Byte temp;
             Byte dataLength = 1;
@@ -311,7 +346,7 @@ public class SocketService extends Service {
             }
 
             temp = (byte) volume;
-            Log.d("socketSend1",temp.toString());
+
             output = new byte[]{VOLUME, 0x31, dataLength,temp};
             try {
                 writer.write(output);
@@ -325,7 +360,7 @@ public class SocketService extends Service {
 
             temp = (byte) tone;
 
-            Log.d("socketSend2",temp.toString());
+
             output = new byte[]{TONE, 0x31, dataLength , temp};
             try {
                 writer.write(output);
@@ -338,7 +373,7 @@ public class SocketService extends Service {
             }
 
             temp = (byte) speed;
-            Log.d("socketSend3",temp.toString());
+
             output = new byte[]{SPEED, 0x31, dataLength, temp};
             try {
                 writer.write(output);
@@ -351,7 +386,7 @@ public class SocketService extends Service {
             }
 
             //終止符號
-            Log.d("socketSend3",temp.toString());
+
             output = new byte[]{TERMINATE, 0x31,0};
             try {
                 writer.write(output);
@@ -371,7 +406,6 @@ public class SocketService extends Service {
         public void onReceive(Context context, Intent intent) {
 
             if(socketConnectSuccess == true){
-                Log.d("SOCKETSERVICE","playlist");
 
                 int state = intent.getIntExtra("state", 2);
                 int list = 0;
@@ -381,7 +415,6 @@ public class SocketService extends Service {
                     byte dataLength = 0x00;
                     byte requestPlayList = 0x61;
 
-                    Log.d("socketplay","startsendRequest");
                     output = new byte[]{requestPlayList, 0x30, dataLength};
 
                     try {
@@ -418,12 +451,10 @@ public class SocketService extends Service {
                         Thread.sleep(500);
 
 
-
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
 
-                    Log.d("socketplay","startsendSongname"+ intent.getStringExtra("songname"));
 
                 }
 
@@ -453,7 +484,7 @@ public class SocketService extends Service {
         Intent it = new Intent(this, AlertDialogActivity.class);
 
         //加入判斷寶寶狀態
-        Log.d("SocketService", content);
+
         Notification notification;
         switch (content){
             case THROWUP:
@@ -523,6 +554,48 @@ public class SocketService extends Service {
                 break;
         }
     }
+
+    public BroadcastReceiver receiverDangerDetect = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d("socketService","receive dnager");
+
+            if(socketConnectSuccess == true){
+                byte dangerDetect = 0x4D;
+                byte[] content;
+
+                try {
+                    String temp = intent.getStringExtra("dangerDetect");
+                    output = new byte[]{dangerDetect, 0x31, 1};
+
+                    writer.write(output);
+                    writer.flush();
+                    Thread.sleep(500);
+
+                    if(temp.contentEquals("0")){
+                        content = new byte[]{0};
+                        writer.write(content);
+                        writer.flush();
+                        Thread.sleep(500);
+                    }else if(temp.contentEquals("1")){
+                        content = new byte[]{1};
+                        writer.write(content);
+                        writer.flush();
+                        Thread.sleep(500);
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }else {
+                Log.d("mode","no socket");
+                Toast.makeText(SocketService.this, "未連線", Toast.LENGTH_SHORT).show();
+            }
+
+        }
+    };
+
 
     public BroadcastReceiver receiverAlert = new BroadcastReceiver() {
 

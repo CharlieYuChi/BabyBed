@@ -79,6 +79,7 @@ public class SettingActivity extends AppCompatActivity implements
     //music的intent要用的
     private  static final int REQUEST_MUSIC = 1;
 
+    private static boolean isServiceExist;
 
     Intent intent;
     /**
@@ -117,7 +118,6 @@ public class SettingActivity extends AppCompatActivity implements
         birthMonth = data.getInt("month");
         birthDay = data.getInt("day");
 
-        Log.d("Gender:", "" +gender);
 
         intent.putExtra("babyName", name);
         intent.putExtra("height", height);
@@ -214,15 +214,6 @@ public class SettingActivity extends AppCompatActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d("setting activity", "bIP:" + brokerIp);
-        Log.d("setting activity", "sIP:" + serverIP);
-        Log.d("setting activity", "name:" + name);
-        Log.d("setting activity", "hei:" + height);
-        Log.d("setting activity", "wei:" + weight);
-        Log.d("setting activity", "gen:" + gender);
-        Log.d("setting activity", "year:" + birthYear);
-        Log.d("setting activity", "mon:" + birthMonth);
-        Log.d("setting activity", "day:" + birthDay);
     }
 
     public void saveConnectData(){
@@ -247,6 +238,13 @@ public class SettingActivity extends AppCompatActivity implements
 
     }
 
+    public void setIsServiceExist(boolean exist){
+        isServiceExist = exist;
+    }
+
+    public boolean getIsServiceExist(){
+        return isServiceExist;
+    }
 
     @Override
     public void setEnterSwichLayout() {

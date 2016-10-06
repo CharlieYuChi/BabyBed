@@ -135,8 +135,6 @@ public class MainActivity extends AppCompatActivity
 
         readData();
 
-        Log.d("MAIN", "name " + babyName);
-        Log.d("MAIN", "headshot " + headshotPath);
         //Toast.makeText(MainActivity.this, "onCreate" + "serverIP" + serverIP, Toast.LENGTH_LONG).show();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -187,7 +185,7 @@ public class MainActivity extends AppCompatActivity
         if (resultCode == RESULT_OK) {
 
             if (requestCode == REQUEST_SETTING) {
-                Log.d("FILE","set");
+
                 brokerIp = data.getStringExtra("brokerIp");
                 serverIp = data.getStringExtra("serverIP");
                 babyName = data.getStringExtra("babyName");
@@ -198,15 +196,6 @@ public class MainActivity extends AppCompatActivity
                 birthMonth = data.getIntExtra("birthMonth",0);
                 birthDay = data.getIntExtra("birthDay",0);
 
-                Log.d(" activity", "bIP:" + brokerIp);
-                Log.d(" activity", "sIP:" + serverIp);
-                Log.d(" activity", "name:" + babyName);
-                Log.d(" activity", "hei:" + height);
-                Log.d(" activity", "wei:" + weight);
-                Log.d(" activity", "gen:" + gender);
-                Log.d(" activity", "year:" + birthYear);
-                Log.d(" activity", "mon:" + birthMonth);
-                Log.d(" activity", "day:" + birthDay);
 
                 saveBabyData();
                 //Toast.makeText(MainActivity.this, "MainResultserverIP:" + serverIP , Toast.LENGTH_LONG).show();
@@ -225,18 +214,18 @@ public class MainActivity extends AppCompatActivity
                 }
                 //Toast.makeText(MainActivity.this, "IP:" + brokerIp + " Port:" + brokerPort + "serverIP:" + serverIP , Toast.LENGTH_LONG).show();
             } else if (requestCode == REQUEST_MUSIC) {
-                Log.d("FILE","music");
+
                 volume = data.getIntExtra("volume", 0);
                 tone = data.getIntExtra("tone", 0);
                 timbre = data.getStringExtra("timbre");
                 speed = data.getStringExtra("speed");
 
             } else if(requestCode == FILE_SELECT_BACKGROUND){
-                Log.d("FILE","start");
+
                 // 取得檔案路徑 Uri
                 Uri uri = data.getData();
                 final String uripath = ImageFilePath.getPath(this, uri);
-                Log.d("FILE","uri"+uripath);
+
                 Bitmap temp = BitmapFactory.decodeFile(uripath);
                 mmain_imageBackground.setImageBitmap(temp);
 
@@ -249,11 +238,11 @@ public class MainActivity extends AppCompatActivity
                 saveImage();
 
             } else if(requestCode == FILE_SELECT_HEADSHOT){
-                Log.d("FILE","start");
+
                 // 取得檔案路徑 Uri
                 Uri uri = data.getData();
                 final String uripath = ImageFilePath.getPath(this, uri);
-                Log.d("FILE","uri"+uripath);
+
                 Bitmap temp = BitmapFactory.decodeFile(uripath);
                 mimageView3.setImageBitmap(temp);
 
@@ -401,17 +390,17 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void setImage(){
-        Log.d("mainmain", "setimage");
+
         settingsField = this.getSharedPreferences(data,0);
         String headTempPath =  settingsField.getString(headshotField, "");
         String backTempPath =  settingsField.getString(bakcgroundField, "");
-        Log.d("mainmain", headTempPath);
+
         if(headTempPath != null){
 
             Bitmap temp = BitmapFactory.decodeFile(headTempPath);
             //mimageView3.setImageBitmap(temp);
         } else {
-            Log.d("mainmain", "default");
+
             mimageView3.setImageResource(R.drawable.baby);
         }
 

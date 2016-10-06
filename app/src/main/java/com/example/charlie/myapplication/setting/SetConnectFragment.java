@@ -4,10 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -38,9 +40,14 @@ public class SetConnectFragment extends BaseFragment{
     private EditText medtIP;
     private EditText medtServerIP;
 
+    SwitchCompat switchCompat;
+    String dangerDetect = "0";
+
     //用來和SettingActivity傳遞資料的接口
     public interface callBackConnect{
         void saveConnect(String bIP, String sIP);
+        void setIsServiceExist(boolean exist);
+        boolean getIsServiceExist();
     }
 
 
@@ -89,12 +96,60 @@ public class SetConnectFragment extends BaseFragment{
             @Override
             public void onClick(View v) {
                 mCallbackConnect.saveConnect(medtIP.getText().toString(), medtServerIP.getText().toString());
-                Intent startIntent = new Intent(v.getContext(), SocketService.class);
-                startIntent.putExtra("serverIP", medtServerIP.getText().toString());
-                Log.d("serverIP",startIntent.getStringExtra("serverIP"));
-                v.getContext().startService(startIntent);
-                Log.d("SetConnect", "startService executed");
+
+                if(mCallbackConnect.getIsServiceExist() == false){
+
+                    Intent startIntent = new Intent(v.getContext(), SocketService.class);
+                    startIntent.putExtra("serverIP", medtServerIP.getText().toString());
+                    startIntent.putExtra("dangerDetect", dangerDetect);
+
+                    v.getContext().startService(startIntent);
+
+                    mCallbackConnect.setIsServiceExist(true);
+
+                }else if(mCallbackConnect.getIsServiceExist() == true){
+
+                    Intent stopIntent = new Intent(v.getContext(), SocketService.class);
+                    v.getContext().stopService(stopIntent);
+
+                    Intent startIntent = new Intent(v.getContext(), SocketService.class);
+                    startIntent.putExtra("serverIP", medtServerIP.getText().toString());
+                    startIntent.putExtra("dangerDetect", dangerDetect);
+
+                    v.getContext().startService(startIntent);
+
+                    mCallbackConnect.setIsServiceExist(true);
+
+                }
+
                 Toast.makeText(getContext(),"Save OK~",Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        switchCompat = (SwitchCompat) v.findViewById(R.id.dangerDetect);
+
+        switchCompat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            boolean DANGER = true;
+            boolean NORMAL = false;
+
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked == DANGER){
+                    Log.d("interactive","mode1");
+                    dangerDetect = "1";
+                    Intent intent = new Intent("DANGERDETECT");
+                    intent.putExtra("dangerDetect",dangerDetect);
+                    v.getContext().sendBroadcast(intent);
+                    switchCompat.setText("危險偵測 : 開 ");
+                }else if(isChecked == NORMAL){
+                    Log.d("normal","mode2");
+                    dangerDetect = "0";
+                    Intent intent = new Intent("DANGERDETECT");
+                    intent.putExtra("dangerDetect",dangerDetect);
+                    v.getContext().sendBroadcast(intent);
+                    switchCompat.setText("危險偵測 : 關 ");
+                }
             }
         });
 

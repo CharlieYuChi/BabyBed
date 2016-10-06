@@ -125,6 +125,7 @@ public class MusicActivity extends AppCompatActivity implements
     private ImageButton mbtn_playmusic;
     private ImageButton mbtn_stopmusic;
     private ListView mListView;
+    SwitchCompat switchCompat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,9 +138,6 @@ public class MusicActivity extends AppCompatActivity implements
         intent = this.getIntent();
         serverIp = intent.getStringExtra("serverIp");
         brokerIp = intent.getStringExtra("brokerIp");
-
-        Log.d("music", "bIP:" + brokerIp);
-        Log.d("music", "sIP:" + serverIp);
 
         final SeekBar volume_bar = (SeekBar) findViewById(R.id.seekbar_volume);
         final SeekBar tone_bar = (SeekBar) findViewById(R.id.seekbar_tone);
@@ -157,7 +155,7 @@ public class MusicActivity extends AppCompatActivity implements
 
         mbtn_stopmusic.setEnabled(false);
 
-        final SwitchCompat switchCompat = (SwitchCompat) findViewById(R.id.switch_compat);
+        switchCompat = (SwitchCompat) findViewById(R.id.switch_compat);
 
         switchCompat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -277,7 +275,9 @@ public class MusicActivity extends AppCompatActivity implements
 
 
         //接收server傳回的資料
-        registerReceiver(receiverPlayButton, new IntentFilter("PLAYBUTTON"));
+        registerReceiver(receiverMusicStatus, new IntentFilter("MUSICSTATUS"));
+        registerReceiver(receiverMode, new IntentFilter("MODE"));
+
 
         //readData();
 
@@ -311,7 +311,7 @@ public class MusicActivity extends AppCompatActivity implements
         } else if (id == R.id.nav_setting) {
             intent.setClass(MusicActivity.this, SettingActivity.class);
             startActivityForResult(intent, REQUEST_SETTING);
-            this.onPause();
+            this.finish();
             //this.finish();
         }
 
@@ -328,9 +328,7 @@ public class MusicActivity extends AppCompatActivity implements
                 Uri uri = data.getData();
                 final String uripath = ImageFilePath.getPath(this, uri);
 
-                Log.d("uriPath", uripath);
 
-                Log.d("buttonSend","Startsend");
                 final SendFile sendFile = new SendFile();
                 Thread th = new Thread(new Runnable() {
                     @Override
@@ -338,7 +336,7 @@ public class MusicActivity extends AppCompatActivity implements
                         try {
                             sendFile.sendFile(uripath,serverIp);
                         } catch (InterruptedIOException e1){
-                            Log.d("Thread","end");
+
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -348,7 +346,6 @@ public class MusicActivity extends AppCompatActivity implements
 
                 th.start();
 
-                Log.d("buttonSend","Endsend");
                 Toast.makeText(this,"傳送完成^^",Toast.LENGTH_SHORT).show();
 
             }
@@ -390,7 +387,7 @@ public class MusicActivity extends AppCompatActivity implements
         Toast.makeText(MusicActivity.this, "成功!" + "tim:" + timbrechose
                 + "spe:" + speedchose
                 + "ton:" + tone
-                + "vol:" + volume, Toast.LENGTH_SHORT).show();
+                + "vol:" + volume, Toast.LENGTH_LONG).show();
         Intent intent = new Intent("MUSICINFO");
         intent.putExtra("volume", volume);
         intent.putExtra("tone", tone);
@@ -401,7 +398,6 @@ public class MusicActivity extends AppCompatActivity implements
 
 
     public void buttonSend(View view) {
-        Log.d("FileDir", String.valueOf(mContext.getFilesDir()));
         fileBrowserIntent();
     }
 
@@ -467,11 +463,9 @@ public class MusicActivity extends AppCompatActivity implements
                 .apply();
         settingsField.edit().putString(toneField, toneTemp).apply();
 
-        Log.d("saveData", "volTemp: " + volTemp + "setfield: " + settingsField.getString(volumeField,""));
     }
 
     public void buttonPlayMusic(View view) {
-        Log.d("BUTTONPLAY","playmusic");
         Intent intent = new Intent("MUSICCONTROL");
         intent.putExtra("control", 1);
         sendBroadcast(intent);
@@ -482,7 +476,6 @@ public class MusicActivity extends AppCompatActivity implements
     }
 
     public void buttonStopMusic(View view) {
-        Log.d("BUTTONSTOP","stopmusic");
         Intent intent = new Intent("MUSICCONTROL");
         intent.putExtra("control", 0);
         sendBroadcast(intent);
@@ -494,7 +487,6 @@ public class MusicActivity extends AppCompatActivity implements
 
     public void buttonPlaylist(View view) {
 
-        Log.d("BUTTONPLAYLIST","playlist");
         Intent intent = new Intent("PLAYLIST");
         intent.putExtra("state",0);
         sendBroadcast(intent);
@@ -511,7 +503,7 @@ public class MusicActivity extends AppCompatActivity implements
         mListView = (ListView) findViewById(R.id.list);
         mListView.setAdapter(new MyAdapter(playList));
         */
-        Toast.makeText(MusicActivity.this, "歌單~~",Toast.LENGTH_SHORT).show();
+        //Toast.makeText(MusicActivity.this, "歌單~~",Toast.LENGTH_SHORT).show();
     }
 
     private class MyAdapter extends BaseAdapter {
@@ -520,10 +512,8 @@ public class MusicActivity extends AppCompatActivity implements
 
         public MyAdapter(ArrayList<String> playListBack){
 
-            Log.d("music","ma");
             mList = new ArrayList<String>();
             mList = playListBack;
-            //Log.d("music","ma: " +mList.get(2));
 
             /*
             for(int i = 0; i < playListBack.size(); i++){
@@ -573,14 +563,12 @@ public class MusicActivity extends AppCompatActivity implements
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                    Toast.makeText(MusicActivity.this,"CLICK " + position,Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(MusicActivity.this,"CLICK " + position,Toast.LENGTH_SHORT).show();
 
-                    Log.d("music","click");
                     Intent intent = new Intent("PLAYLIST");
                     intent.putExtra("state",1);
                     intent.putExtra("songname",mList.get(position));
                     sendBroadcast(intent);
-                    Log.d("music","clickend");
 
                     //關閉歌單
                     removeItem();
@@ -613,31 +601,72 @@ public class MusicActivity extends AppCompatActivity implements
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d("music","receive");
             Bundle data = intent.getBundleExtra("PLAYLIST");
 
             ArrayList<String> playList = data.getStringArrayList("playlist");
 
-            //Log.d("music", "song: " + playList.get(1));
-
             mListView = (ListView) findViewById(R.id.list);
             mListView.setAdapter(new MyAdapter(playList));
 
-            Log.d("music","creativeview");
         }
     };
 
-    public BroadcastReceiver receiverPlayButton = new BroadcastReceiver() {
+    public BroadcastReceiver receiverMusicStatus = new BroadcastReceiver() {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d("music","receiveplay");
+            final String MUSICEND = "0";
+            final String MUSICPAUSE = "1";
+            final String MUSICPLAY = "2";
 
-            mbtn_stopmusic.setEnabled(false);
-            mbtn_playmusic.setEnabled(true);
-            mtxtControlMusic.setText("準備播放");
+            String musicStatus = intent.getStringExtra("musicStatus");
 
-            Log.d("music","creativeview");
+            switch (musicStatus){
+                case MUSICEND:
+                    mbtn_stopmusic.setEnabled(false);
+                    mbtn_playmusic.setEnabled(true);
+                    mtxtControlMusic.setText("準備播放");
+                    break;
+
+                case MUSICPAUSE:
+                    mbtn_stopmusic.setEnabled(false);
+                    mbtn_playmusic.setEnabled(true);
+                    mtxtControlMusic.setText("準備播放");
+                    break;
+
+                case MUSICPLAY:
+                    mbtn_playmusic.setEnabled(false);
+                    mbtn_stopmusic.setEnabled(true);
+                    mtxtControlMusic.setText("播放中~");
+                    break;
+
+                default:
+                    break;
+
+            }
+
+        }
+    };
+
+    public BroadcastReceiver receiverMode = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d("Music", "re mode");
+            String mode = intent.getStringExtra("mode");
+            Log.d("Music", "mode: " + mode);
+
+            if(mode.contentEquals("0")){
+                switchCompat.setChecked(false);
+                switchCompat.setText("普通模式");
+
+                Log.d("Music", "mode: 5");
+            }else if(mode.contentEquals("1")){
+                switchCompat.setChecked(true);
+                switchCompat.setText("互動模式");
+
+                Log.d("Music", "mode: 6");
+            }
         }
     };
 

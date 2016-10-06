@@ -22,14 +22,14 @@ public class ClientThread implements Runnable {
     private Handler handler;
     private DataInputStream br = null;
     private final byte DANGER = 0x0C;
-    private final byte MODE = 0x00;
+    private final byte MODE = 0x10;
     private final byte PLAYLIST = 0x20;
     private final byte TERMINATE = 0x1F;
-    private final byte SONGEND = 0x3F;
+    private final byte MUSICSTATUS = 0x3F;
     private final int wDANGER = 0;
     private final int wMODE = 1;
     private final int wPLAYLIST = 2;
-    private final int wSONGEND = 3;
+    private final int wMUSICSTATUS = 3;
     private static ArrayList playlist;
     private boolean newList = true;
 
@@ -49,7 +49,6 @@ public class ClientThread implements Runnable {
 
 
             // 不断读取Socket输入流的内容
-            Log.d("client", "while");
             //while((content = br.readLine())!=null){
 
             while(true){
@@ -60,23 +59,19 @@ public class ClientThread implements Runnable {
                 Log.d("CTTEMP", ""+temp);
 
                 if (temp != -1) {
-                    Log.d("client", ""+header);
 
                     type = (byte) (header[0]&0x3F);
 
                     if(type == DANGER){
-                        Log.d("DANGERDANGER", "GGBABYGGGG");
                         int length = (int)getLength(header);
 
                         byte[] content = new byte[length];
                         temp = br.read(content);
 
-                        Log.d("client: ", "content: "+ content[0]);
                         Message msg = new Message();
                         msg.what = wDANGER;
                         msg.obj = content[0];                                                                                                                                                ;
                         handler.sendMessage(msg);
-                        Log.d("client", "handlersend");
                     } else if(type == MODE){
                         Log.d("MODEMODE", "CHANGE");
                         int length = (int)getLength(header);
@@ -84,12 +79,10 @@ public class ClientThread implements Runnable {
                         byte[] content = new byte[length];
                         temp = br.read(content);
 
-                        Log.d("client: ", "content: "+ content[0]);
                         Message msg = new Message();
                         msg.what = wMODE;
-                        msg.obj = content[0];                                                                                                                                                ;
+                        msg.obj = content[0];
                         handler.sendMessage(msg);
-                        Log.d("client", "handlersend");
                     } else if(type == PLAYLIST){
 
                         if(newList == false){
@@ -97,20 +90,16 @@ public class ClientThread implements Runnable {
                             newList = true;
                         }
 
-                        Log.d("CT","playlist");
-
                         int length = (int)getLength(header);
 
                         byte[] content = new byte[length];
 
                         temp = br.read(content);
                         String songName = new String(content);
-                        Log.d("CLIENTTHREAD","songname: " + songName);
 
                         playlist.add(songName);
 
                     } else if(type == TERMINATE){
-                        Log.d("CT","endplaylist");
                         Message msg = new Message();
                         msg.what = wPLAYLIST;
                         Bundle data = new Bundle();
@@ -118,10 +107,16 @@ public class ClientThread implements Runnable {
                         msg.setData(data);
                         handler.sendMessage(msg);
                         newList = false;
-                    } else if(type == SONGEND){
-                        Log.d("CT","SONGEND");
+                    } else if(type == MUSICSTATUS){
+
+                        int length = (int)getLength(header);
+
+                        byte[] content = new byte[length];
+                        temp = br.read(content);
+
                         Message msg = new Message();
-                        msg.what = wSONGEND;
+                        msg.what = wMUSICSTATUS;
+                        msg.obj = content[0];
                         handler.sendMessage(msg);
                     }
 
@@ -131,10 +126,8 @@ public class ClientThread implements Runnable {
 
             }
         } catch (Exception e) {
-            Log.d("client", "printstack");
             e.printStackTrace();
         }
-        Log.d("client", "endrun");
     }
 
     public Byte getLength(byte[] header){

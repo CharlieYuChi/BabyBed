@@ -142,10 +142,10 @@ public class VideoActivity extends AppCompatActivity implements
 
         if (videoIp == null) {
             Toast.makeText(this, "IP未設定!!!", Toast.LENGTH_SHORT).show();
-            Log.d("brokerIP Null", "NULLLLLL");
+
         } else {
             webview.loadUrl("http://"+ videoIp +":"+videoPort+"/baby.html");
-            Log.d("No Null", "NONOONONO");
+
         }
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -332,8 +332,6 @@ public class VideoActivity extends AppCompatActivity implements
 
                     ac.startCapture();
                     ic.start();
-
-
                 }
             }
         });
