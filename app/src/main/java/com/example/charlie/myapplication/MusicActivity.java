@@ -89,8 +89,8 @@ public class MusicActivity extends AppCompatActivity implements
     private static int tone = 0 ;  //1個8 2個8
     private static String timbre = "";
     private static String speed = "";
-    int speedchose;
-    int timbrechose;
+    private static int speedchose = 2;
+    private static int timbrechose = 0;
     private SharedPreferences settingsField;
     private static final String data = "DATA";
     private static final String data2 = "DATA2";
@@ -98,6 +98,11 @@ public class MusicActivity extends AppCompatActivity implements
     private static final String toneField = "50";
     private static final String timbreField = "電子鋼琴";
     private static final String speedField = "正常";
+    private static boolean playBtnState = true;
+    private static boolean stopBtnState = false;
+    private static String controlMusicState = "準備播放";
+    private static boolean modeBtnState = false;
+    private static String modeString = "普通模式";
 
     //socket用的變數
     private static String serverIp;
@@ -111,7 +116,7 @@ public class MusicActivity extends AppCompatActivity implements
     private Spinner mspinner_timbre, mspinner_speed;
     private ArrayAdapter lunchList_timbre, lunchList_speed;
     private Context mContext;
-    private String[] spn_timbre = {"原聲","電子鋼琴", "吉他", "acapella"};
+    private String[] spn_timbre = {"原聲","長笛", "鋼琴", "豎琴","高音木琴","小提琴","尼龍吉他"};
     private String[] spn_speed = {"0.5", "0.75", "正常", "1.5", "2"};
     private Intent intent = new Intent();
     /**
@@ -153,26 +158,51 @@ public class MusicActivity extends AppCompatActivity implements
         mbtn_playmusic = (ImageButton) findViewById(R.id.btn_playmusic);
         mbtn_stopmusic = (ImageButton) findViewById(R.id.btn_stopmusic);
 
-        mbtn_stopmusic.setEnabled(false);
+        mbtn_playmusic.setEnabled(playBtnState);
+        mbtn_stopmusic.setEnabled(stopBtnState);
+        mtxtControlMusic.setText(controlMusicState);
 
         switchCompat = (SwitchCompat) findViewById(R.id.switch_compat);
+        switchCompat.setChecked(modeBtnState);
+        switchCompat.setText(modeString);
 
         switchCompat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked == INTERACTIVE){
                     Log.d("interactive","mode1");
+                    modeBtnState = INTERACTIVE;
+
+                    playBtnState = false;
+                    stopBtnState = false;
+
+                    mbtn_playmusic.setEnabled(playBtnState);
+                    mbtn_stopmusic.setEnabled(stopBtnState);
+
                     Intent intent = new Intent("MUSICMODE");
                     intent.putExtra("mode", 1);
                     sendBroadcast(intent);
-                    switchCompat.setText("互動模式");
+
+                    modeString = "互動模式";
+                    switchCompat.setText(modeString);
 
                 }else if(isChecked == NORMAL){
                     Log.d("normal","mode2");
+                    modeBtnState = NORMAL;
+
+                    playBtnState = true;
+                    stopBtnState = true;
+
+                    mbtn_playmusic.setEnabled(playBtnState);
+                    mbtn_stopmusic.setEnabled(stopBtnState);
+
                     Intent intent = new Intent("MUSICMODE");
                     intent.putExtra("mode", 0);
                     sendBroadcast(intent);
-                    switchCompat.setText("普通模式");
+
+                    modeString = "普通模式";
+                    switchCompat.setText(modeString);
+
                 }
             }
         });
@@ -190,9 +220,11 @@ public class MusicActivity extends AppCompatActivity implements
         lunchList_timbre = new ArrayAdapter<String>(MusicActivity.this, R.layout.spinner_item, spn_timbre);
         lunchList_timbre.setDropDownViewResource(R.layout.spinner_item);
         mspinner_timbre.setAdapter(lunchList_timbre);
+        mspinner_timbre.setSelection(timbrechose);
         lunchList_speed = new ArrayAdapter<String>(MusicActivity.this, R.layout.spinner_item, spn_speed);
         lunchList_speed.setDropDownViewResource(R.layout.spinner_item);
         mspinner_speed.setAdapter(lunchList_speed);
+        mspinner_speed.setSelection(speedchose);
 
         mspinner_timbre.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -328,7 +360,6 @@ public class MusicActivity extends AppCompatActivity implements
                 Uri uri = data.getData();
                 final String uripath = ImageFilePath.getPath(this, uri);
 
-
                 final SendFile sendFile = new SendFile();
                 Thread th = new Thread(new Runnable() {
                     @Override
@@ -362,7 +393,6 @@ public class MusicActivity extends AppCompatActivity implements
         }
     }
 
-
     @Override
     public void onDestroy() {
         setExitSwichLayout();
@@ -384,10 +414,10 @@ public class MusicActivity extends AppCompatActivity implements
     public void buttonSave(View view) {
         //saveData();
         setResult(RESULT_OK, intent);
-        Toast.makeText(MusicActivity.this, "成功!" + "tim:" + timbrechose
-                + "spe:" + speedchose
-                + "ton:" + tone
-                + "vol:" + volume, Toast.LENGTH_LONG).show();
+        //Toast.makeText(MusicActivity.this, "成功!" + "tim:" + timbrechose
+         //       + "spe:" + speedchose
+         //       + "ton:" + tone
+          //      + "vol:" + volume, Toast.LENGTH_LONG).show();
         Intent intent = new Intent("MUSICINFO");
         intent.putExtra("volume", volume);
         intent.putExtra("tone", tone);
@@ -470,9 +500,13 @@ public class MusicActivity extends AppCompatActivity implements
         intent.putExtra("control", 1);
         sendBroadcast(intent);
 
-        mbtn_playmusic.setEnabled(false);
-        mbtn_stopmusic.setEnabled(true);
-        mtxtControlMusic.setText("播放中~");
+        playBtnState = false;
+        stopBtnState = true;
+        controlMusicState = "播放中~";
+
+        mbtn_playmusic.setEnabled(playBtnState);
+        mbtn_stopmusic.setEnabled(stopBtnState);
+        mtxtControlMusic.setText(controlMusicState);
     }
 
     public void buttonStopMusic(View view) {
@@ -480,9 +514,13 @@ public class MusicActivity extends AppCompatActivity implements
         intent.putExtra("control", 0);
         sendBroadcast(intent);
 
-        mbtn_stopmusic.setEnabled(false);
-        mbtn_playmusic.setEnabled(true);
-        mtxtControlMusic.setText("準備播放");
+        playBtnState = true;
+        stopBtnState = false;
+        controlMusicState = "準備播放";
+
+        mbtn_stopmusic.setEnabled(stopBtnState);
+        mbtn_playmusic.setEnabled(playBtnState);
+        mtxtControlMusic.setText(controlMusicState);
     }
 
     public void buttonPlaylist(View view) {

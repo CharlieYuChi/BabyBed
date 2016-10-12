@@ -34,7 +34,7 @@ public class SetConnectFragment extends BaseFragment{
 
     private SharedPreferences settingsField;
     private static final String data = "DATA";
-    private static final String ipField = "IP";
+    private static final String brokerIpField = "BROKERIP";
     private static final String serverIPField = "SERVER_IP";
 
     private EditText medtIP;
@@ -158,7 +158,7 @@ public class SetConnectFragment extends BaseFragment{
 
     public void readData(){
         settingsField = this.getActivity().getSharedPreferences(data,0);
-        medtIP.setText(settingsField.getString(ipField, ""));
+        medtIP.setText(settingsField.getString(brokerIpField, ""));
         medtServerIP.setText(settingsField.getString(serverIPField, ""));
     }
 

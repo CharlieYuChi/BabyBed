@@ -152,8 +152,6 @@ public class SocketService extends Service {
                 // 开始执行后台任务
 
                 try {
-                    //socket = new Socket("140.115.204.92", 8080);
-                    //socket = new Socket("192.168.0.113",8080);
                     socket = new Socket(serverIP,8080);
 
                     output = new byte[]{0x00,0x30};
@@ -179,7 +177,7 @@ public class SocketService extends Service {
 
                         try {
                             //content = dangerDetect.getBytes();
-                            output = new byte[]{dangerType, 0x31, 1};
+                            output = new byte[]{dangerType, 0x30, 1};
 
                             writer.write(output);
                             writer.flush();
@@ -208,6 +206,7 @@ public class SocketService extends Service {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
                 /*
                 while (true){
                     try {
@@ -219,12 +218,14 @@ public class SocketService extends Service {
                 }
                 */
 
+                //if (socketConnectSuccess == false){
+                 //   Toast.makeText(SocketService.this, "未連接到伺服器",Toast.LENGTH_SHORT).show();
+                //}
+
             }
         }).start();
 
-        if (socketConnectSuccess == false){
-            Toast.makeText(SocketService.this, "未連接到伺服器",Toast.LENGTH_SHORT).show();
-        }
+
 
 
         return super.onStartCommand(intent, flags, startId);
@@ -268,7 +269,6 @@ public class SocketService extends Service {
                     }
                 }
             } else {
-                Log.d("control","no socket");
                 Toast.makeText(SocketService.this, "未連線", Toast.LENGTH_SHORT).show();
             }
         }
@@ -332,71 +332,76 @@ public class SocketService extends Service {
             Byte temp;
             Byte dataLength = 1;
 
-            temp = (byte)timbre;
-            Log.d("socketSend4",temp.toString());
-            output = new byte[]{TIMBRE, 0x31, dataLength ,temp};
-            try {
-                writer.write(output);
-                writer.flush();
-                Thread.sleep(500);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            if(socketConnectSuccess == true){
+                temp = (byte)timbre;
+                Log.d("socketSend4",temp.toString());
+                output = new byte[]{TIMBRE, 0x31, dataLength ,temp};
+                try {
+                    writer.write(output);
+                    writer.flush();
+                    Thread.sleep(500);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                temp = (byte) volume;
+
+                output = new byte[]{VOLUME, 0x31, dataLength,temp};
+                try {
+                    writer.write(output);
+                    writer.flush();
+                    Thread.sleep(500);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                temp = (byte) tone;
+
+
+                output = new byte[]{TONE, 0x31, dataLength , temp};
+                try {
+                    writer.write(output);
+                    writer.flush();
+                    Thread.sleep(500);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                temp = (byte) speed;
+
+                output = new byte[]{SPEED, 0x31, dataLength, temp};
+                try {
+                    writer.write(output);
+                    writer.flush();
+                    Thread.sleep(500);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                //終止符號
+
+                output = new byte[]{TERMINATE, 0x31,0};
+                try {
+                    writer.write(output);
+                    writer.flush();
+                    Thread.sleep(500);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }else {
+                Toast.makeText(SocketService.this, "未連線", Toast.LENGTH_SHORT).show();
             }
 
-            temp = (byte) volume;
-
-            output = new byte[]{VOLUME, 0x31, dataLength,temp};
-            try {
-                writer.write(output);
-                writer.flush();
-                Thread.sleep(500);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            temp = (byte) tone;
-
-
-            output = new byte[]{TONE, 0x31, dataLength , temp};
-            try {
-                writer.write(output);
-                writer.flush();
-                Thread.sleep(500);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            temp = (byte) speed;
-
-            output = new byte[]{SPEED, 0x31, dataLength, temp};
-            try {
-                writer.write(output);
-                writer.flush();
-                Thread.sleep(500);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            //終止符號
-
-            output = new byte[]{TERMINATE, 0x31,0};
-            try {
-                writer.write(output);
-                writer.flush();
-                Thread.sleep(500);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
     };
 
@@ -445,16 +450,22 @@ public class SocketService extends Service {
                         writer.flush();
                         Thread.sleep(500);
 
-                        output = new byte[]{TERMINATE, 0x31,0};
-                        writer.write(output);
-                        writer.flush();
-                        Thread.sleep(500);
+                        //終止符號
 
+                        output = new byte[]{TERMINATE, 0x31,0};
+                        try {
+                            writer.write(output);
+                            writer.flush();
+                            Thread.sleep(500);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
 
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-
 
                 }
 
@@ -566,8 +577,9 @@ public class SocketService extends Service {
                 byte[] content;
 
                 try {
+                    Log.d("socketservice", "dangerdetect ininin");
                     String temp = intent.getStringExtra("dangerDetect");
-                    output = new byte[]{dangerDetect, 0x31, 1};
+                    output = new byte[]{dangerDetect, 0x30, 1};
 
                     writer.write(output);
                     writer.flush();

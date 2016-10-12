@@ -130,10 +130,6 @@ public class VideoActivity extends AppCompatActivity implements
         videoIp = intent.getStringExtra("brokerIp");
         serverIp = intent.getStringExtra("serverIp");
 
-        Log.d(" video", "bIP:" + videoIp);
-        Log.d(" video", "sIP:" + serverIp);
-
-
         timbre = intent.getStringExtra("timbre");
         speed = intent.getStringExtra("speed");
         tone = intent.getIntExtra("tone", 0);
@@ -177,9 +173,13 @@ public class VideoActivity extends AppCompatActivity implements
         Intent intent = new Intent();
 
         if (id == R.id.nav_main) {
+            hangUp();
+
             setExitSwichLayout();
             this.finish();
         } else if (id == R.id.nav_music) {
+            hangUp();
+
             intent.setClass(VideoActivity.this, MusicActivity.class);
             intent.putExtra("serverIp", serverIp);
             intent.putExtra("brokerIp", videoIp);
@@ -189,6 +189,8 @@ public class VideoActivity extends AppCompatActivity implements
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_video);
             drawer.closeDrawer(GravityCompat.START);
         } else if (id == R.id.nav_setting) {
+            hangUp();
+
             intent.setClass(VideoActivity.this, SettingActivity.class);
             startActivityForResult(intent, REQUEST_SETTING);
             this.finish();
@@ -310,46 +312,139 @@ public class VideoActivity extends AppCompatActivity implements
         client.disconnect();
     }
 
+    private boolean callState = true;
+
+
     //打電話
     public void buttonCallBaby(View view) {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                byte[] output = new byte[]{0x49, 0x30, 0x00};
 
-                try {
-                    socket = new Socket(serverIp, serverPort);
-                    writer = socket.getOutputStream();
-                    writer.write(output);
-                    writer.flush();
-                } catch (IOException e) {
-                    e.printStackTrace();
+
+        if(callState == true){
+            Thread thread = new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+
+                    byte[] output = new byte[]{0x49, 0x30, 0x00};
+
+                    try {
+                        socket = new Socket(serverIp, serverPort);
+                        writer = socket.getOutputStream();
+                        writer.write(output);
+                        writer.flush();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    if(socket != null){
+                         runOnUiThread(new Runnable() {
+                             @Override
+                             public void run() {
+                                 mtxtRecord.setText("通話中...");
+                                 mbtn_listenBaby.setEnabled(false);
+                                 mbtn_callBaby.setEnabled(false);
+                             }
+                         });
+                    }else if(socket == null){
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(VideoActivity.this, "未連線", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+
+                    if(socket != null){
+                        ac = new AudioCapturer(socket);
+                        ic = new Incall(socket);
+
+                        ac.startCapture();
+                        ic.start();
+                        callState = false;
+                    }
                 }
+            });
 
-                if(socket != null){
-                    ac = new AudioCapturer(socket);
-                    ic = new Incall(socket);
-
-                    ac.startCapture();
-                    ic.start();
-                }
-            }
-        });
-
-        thread.start();
-
-        if(socket != null){
-            mtxtRecord.setText("通話中...");
-            mbtn_listenBaby.setEnabled(false);
-        }else if(socket == null){
-            Toast.makeText(VideoActivity.this, "未連線", Toast.LENGTH_SHORT).show();
+            thread.start();
         }
+
 
     }
 
     //掛電話
     public void buttonHangup(View view) {
 
+        hangUp();
+
+        mtxtRecord.setText("準備通話");
+        mbtn_listenBaby.setEnabled(true);
+        mbtn_callBaby.setEnabled(true);
+        if(socket == null){
+            Toast.makeText(VideoActivity.this, "未連線", Toast.LENGTH_SHORT).show();
+        }
+
+        callState = true;
+    }
+
+    public void saveData(){
+        settingsField = getSharedPreferences(data,0);
+        settingsField.edit()
+                .putString(ipField, videoIp)
+                .putString(serverIpField, serverIp)
+                .apply();
+    }
+
+
+    public void buttonListenBaby(View view) {
+
+        if(callState == true){
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    byte[] output = new byte[]{0x49, 0x30, 0x00};
+
+                    try {
+                        socket = new Socket(serverIp, serverPort);
+                        writer = socket.getOutputStream();
+                        writer.write(output);
+                        writer.flush();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    if(socket != null){
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mtxtRecord.setText("通話中...");
+                                mbtn_callBaby.setEnabled(false);
+                                mbtn_listenBaby.setEnabled(false);
+                            }
+                        });
+
+                        ic = new Incall(socket);
+                        ic.start();
+
+                        callState = false;
+                    }else if(socket == null){
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(VideoActivity.this, "未連線", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                }
+            });
+
+            thread.start();
+        }
+
+        callState = false;
+    }
+
+    public void hangUp(){
         if(ac != null){
             if(ac.isCaptureStarted() == true){
                 ac.stopCapture();
@@ -369,53 +464,5 @@ public class VideoActivity extends AppCompatActivity implements
         } catch (IOException e) {
             e.printStackTrace();
         }
-        mtxtRecord.setText("準備通話");
-        mbtn_listenBaby.setEnabled(true);
-        mbtn_callBaby.setEnabled(true);
-        if(socket == null){
-            Toast.makeText(VideoActivity.this, "未連線", Toast.LENGTH_SHORT).show();
-        }
     }
-
-    public void saveData(){
-        settingsField = getSharedPreferences(data,0);
-        settingsField.edit()
-                .putString(ipField, videoIp)
-                .putString(serverIpField, serverIp)
-                .apply();
-    }
-
-
-    public void buttonListenBaby(View view) {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                byte[] output = new byte[]{0x49, 0x30, 0x00};
-
-                try {
-                    socket = new Socket(serverIp, serverPort);
-                    writer = socket.getOutputStream();
-                    writer.write(output);
-                    writer.flush();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                if(socket != null){
-                    ic = new Incall(socket);
-                    ic.start();
-                }
-            }
-        });
-
-        thread.start();
-
-        if(socket != null){
-            mtxtRecord.setText("通話中...");
-            mbtn_callBaby.setEnabled(false);
-        }else if(socket == null){
-            Toast.makeText(VideoActivity.this, "未連線", Toast.LENGTH_SHORT).show();
-        }
-    }
-
 }

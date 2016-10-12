@@ -56,7 +56,7 @@ public class SettingActivity extends AppCompatActivity implements
 
     private SharedPreferences settingsField;
     private static final String data = "DATA";
-    private static final String ipField = "IP";
+    private static final String brokerIpField = "BROKERIP";
     private static final String portField = "PORT";
     private static final String serverIPField = "SERVER_IP";
     private static final String nameField = "NAME";
@@ -136,6 +136,8 @@ public class SettingActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set);
+
+        //readData();
 
         intent = this.getIntent();
         iniBarComponent();  //初始化BAR
@@ -219,7 +221,7 @@ public class SettingActivity extends AppCompatActivity implements
     public void saveConnectData(){
         settingsField = getSharedPreferences(data,0);
         settingsField.edit()
-                .putString(ipField, brokerIp)
+                .putString(brokerIpField, brokerIp)
                 .putString(serverIPField, serverIP)
                 .apply();
     }
@@ -238,6 +240,18 @@ public class SettingActivity extends AppCompatActivity implements
 
     }
 
+    public void readData(){
+        settingsField = getSharedPreferences(data,0);
+        name = settingsField.getString(nameField,"");
+        height = settingsField.getString(heightField,"");
+        weight = settingsField.getString(weightField,"");
+        gender = settingsField.getInt(genderField,0);
+        birthYear = settingsField.getInt(nameField,0);
+        birthMonth = settingsField.getInt(nameField,0);
+        birthDay = settingsField.getInt(nameField,0);
+        brokerIp = settingsField.getString(brokerIpField,"");
+        serverIP = settingsField.getString(serverIPField,"");
+    }
     public void setIsServiceExist(boolean exist){
         isServiceExist = exist;
     }

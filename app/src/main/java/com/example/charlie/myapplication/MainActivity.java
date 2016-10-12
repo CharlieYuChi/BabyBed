@@ -75,6 +75,8 @@ public class MainActivity extends AppCompatActivity
     private static final String genderField = "GENDER";
     private static final String headshotField = "HEADSHOT";
     private static final String bakcgroundField = "BACKGROUND";
+    private static final String serverIpField = "SERVERIP";
+    private static final String brokerIpField = "BROKERIP";
 
 
     //Music用的變數
@@ -149,6 +151,11 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        Intent startIntent = new Intent(this, SocketService.class);
+        startIntent.putExtra("serverIP",serverIp);
+        startIntent.putExtra("dangerDetect", "0");
+
+        startService(startIntent);
     }
 
 
@@ -157,6 +164,9 @@ public class MainActivity extends AppCompatActivity
     public void onDestroy() {
 
         setExitSwichLayout();
+
+        settingsField = getSharedPreferences(data,0);
+        settingsField.edit().putString(serverIpField,serverIp).apply();
 
         Intent stopIntent = new Intent(this, SocketService.class);
         stopService(stopIntent);
@@ -337,6 +347,8 @@ public class MainActivity extends AppCompatActivity
                 .putString(heightField, height)
                 .putString(weightField, weight)
                 .putInt(genderField, gender)
+                .putString(serverIpField, serverIp)
+                .putString(brokerIpField, brokerIp)
                 .apply();
 
     }
@@ -355,6 +367,9 @@ public class MainActivity extends AppCompatActivity
         show_name.setText(settingsField.getString(nameField, ""));
         show_height.setText(settingsField.getString(heightField, ""));
         show_weight.setText(settingsField.getString(weightField, ""));
+
+        serverIp = settingsField.getString(serverIpField,"");
+        brokerIp = settingsField.getString(brokerIpField,"");
 
         if (settingsField.getInt(genderField,0) == GENDER_BOY) {
             genderImg.setImageDrawable(getResources().getDrawable(R.drawable.icon_boy, null));
